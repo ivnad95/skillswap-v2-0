@@ -12,8 +12,37 @@ export const metadata: Metadata = {
   description: "Connect with the SkillSwap community",
 }
 
+interface ForumTopic {
+  id: number;
+  title: string;
+  author: string;
+  avatar: string;
+  replies: number;
+  views: number;
+  lastActivity: string;
+  category: string;
+}
+
+interface Event {
+  id: number;
+  title: string;
+  host: string;
+  date: string;
+  time: string;
+  attendees: number;
+  category: string;
+}
+
+interface Group {
+  id: number;
+  name: string;
+  members: number;
+  description: string;
+  category: string;
+}
+
 export default function CommunityPage() {
-  const forumTopics = [
+  const forumTopics: ForumTopic[] = [
     {
       id: 1,
       title: "Best resources for learning JavaScript in 2024",
@@ -46,7 +75,7 @@ export default function CommunityPage() {
     },
   ]
 
-  const events = [
+  const events: Event[] = [
     {
       id: 1,
       title: "JavaScript Workshop: Building Modern Web Apps",
@@ -76,7 +105,7 @@ export default function CommunityPage() {
     },
   ]
 
-  const groups = [
+  const groups: Group[] = [
     {
       id: 1,
       name: "JavaScript Developers",
