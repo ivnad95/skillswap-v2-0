@@ -57,7 +57,7 @@ export function AccountSettings() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-end">
-          <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+          <Button variant="gradient">
             Save Changes
           </Button>
         </CardFooter>
@@ -83,7 +83,7 @@ export function AccountSettings() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-end">
-          <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+          <Button variant="gradient">
             Update Password
           </Button>
         </CardFooter>

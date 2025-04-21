@@ -147,7 +147,7 @@ export default async function SessionsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Sessions</h1>
           <p className="text-muted-foreground">Manage your teaching and learning sessions.</p>
         </div>
-        <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+        <Button variant="gradient">
           <CalendarPlus className="mr-2 h-4 w-4" /> Schedule Session
         </Button>
       </div>

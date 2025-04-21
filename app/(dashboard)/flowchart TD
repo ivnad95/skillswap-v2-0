@@ -1,0 +1,106 @@
+flowchart TD
+    A[User Visits Site] --> B{Is User Authenticated?}
+    
+    B -->|No| C[Landing Page]
+    B -->|Yes| D[Dashboard]
+    
+    %% Public Routes
+    C --> C1[Features]
+    C --> C2[About]
+    C --> C3[Pricing]
+    C --> C4[Contact]
+    C --> C5{User Action}
+    
+    C5 -->|Sign Up| E[Signup Process]
+    C5 -->|Log In| F[Login Process]
+    
+    %% Auth Flow
+    E --> E1[Create Account]
+    E1 --> G[Onboarding Flow]
+    F --> F1[Authentication]
+    F1 -->|Success| D
+    F1 -->|Onboarding Incomplete| G
+    
+    %% Onboarding Flow
+    G --> G1[Welcome Step]
+    G1 --> G2[Personal Info Step]
+    G2 --> G3[Skills to Teach Step]
+    G3 --> G4[Skills to Learn Step]
+    G4 --> G5[Availability Step]
+    G5 --> G6[Profile Photo Step]
+    G6 --> G7[Complete Step]
+    G7 --> D
+    
+    %% Main Dashboard Flow
+    D --> D1[Dashboard Home]
+    D --> D2[Skills Management]
+    D --> D3[Session Management]
+    D --> D4[Explore Skills/Teachers]
+    D --> D5[Messages]
+    D --> D6[Community]
+    D --> D7[Billing/Tokens]
+    
+    %% Skills Flow
+    D2 --> D2_1[Teaching Skills]
+    D2 --> D2_2[Learning Skills]
+    D2 --> D2_3[Add New Skill]
+    D2_3 -->|Teaching| D2_3_1[Create Teaching Skill]
+    D2_3 -->|Learning| D2_3_2[Create Learning Skill]
+    
+    %% Sessions Flow
+    D3 --> D3_1[Upcoming Sessions]
+    D3 --> D3_2[Session History]
+    D3 --> D3_3[Calendar View]
+    D3 --> D3_4[Schedule New Session]
+    D3_4 --> D3_5[Select Skill]
+    D3_5 --> D3_6[Select Date/Time]
+    D3_6 --> D3_7[Confirm Tokens]
+    D3_7 --> D3_8[Session Created]
+    
+    %% Explore Flow
+    D4 --> D4_1[Browse Skills]
+    D4 --> D4_2[Browse Teachers]
+    D4 --> D4_3[Upcoming Public Sessions]
+    D4_1 --> D4_4[Skill Details]
+    D4_2 --> D4_5[Teacher Profile]
+    D4_4 --> D3_4
+    D4_5 --> D3_4
+    
+    %% Messages Flow
+    D5 --> D5_1[Chat Interface]
+    D5_1 --> D5_2[Send/Receive Messages]
+    D5_1 --> D5_3[Schedule Session]
+    D5_3 --> D3_4
+    
+    %% Community Flow
+    D6 --> D6_1[Discussion Forums]
+    D6 --> D6_2[Events]
+    D6 --> D6_3[Groups]
+    D6_1 --> D6_1_1[View/Create Topics]
+    D6_2 --> D6_2_1[View/RSVP Events]
+    D6_3 --> D6_3_1[Join/Create Groups]
+    
+    %% Billing Flow
+    D7 --> D7_1[Subscription Management]
+    D7 --> D7_2[Token Management]
+    D7 --> D7_3[Payment Methods]
+    D7 --> D7_4[Billing History]
+    D7_2 --> D7_2_1[Buy Tokens]
+    D7_2 --> D7_2_2[View Token Transactions]
+    
+    %% Session Interactions
+    D3_1 --> D3_1_1[Session Details]
+    D3_1_1 --> D3_1_2[Video Call]
+    D3_1_1 --> D3_1_3[Chat]
+    D3_1_1 --> D3_1_4[Location]
+    
+    %% AI Features
+    D1 --> AI1[AI Skill Matching]
+    D1 --> AI2[Learning Recommendations]
+    D4 --> AI3[AI-powered Search]
+    
+    %% Token System
+    D3_8 -->|Teaching| TS1[Earn Tokens]
+    D3_8 -->|Learning| TS2[Spend Tokens]
+    TS1 --> D7_2
+    TS2 --> D7_2

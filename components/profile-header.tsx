@@ -92,7 +92,7 @@ export function ProfileHeader({ profileData, user, onEditClick }: ProfileHeaderP
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={onEditClick}>
+                <Button variant="gradient" size="sm" onClick={onEditClick}>
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Profile
                 </Button>

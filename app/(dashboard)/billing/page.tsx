@@ -19,7 +19,7 @@ export default function BillingPage() {
           <h1 className="text-3xl font-bold tracking-tight">Billing</h1>
           <p className="text-muted-foreground">Manage your subscription and tokens.</p>
         </div>
-        <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+        <Button variant="gradient">
           <Plus className="mr-2 h-4 w-4" /> Buy Tokens
         </Button>
       </div>
@@ -120,7 +120,7 @@ export default function BillingPage() {
               <Button variant="outline" className="text-red-500 hover:text-red-600">
                 Cancel Subscription
               </Button>
-              <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+              <Button variant="gradient">
                 Upgrade to Annual ($100/year)
               </Button>
             </CardFooter>
@@ -144,7 +144,7 @@ export default function BillingPage() {
                     <p className="text-sm text-muted-foreground">Current balance</p>
                   </div>
                 </div>
-                <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                <Button variant="gradient">
                   Buy More Tokens
                 </Button>
               </div>
@@ -167,7 +167,7 @@ export default function BillingPage() {
                     <div className="font-medium">Standard</div>
                     <div className="text-2xl font-bold mt-1">150 Tokens</div>
                     <div className="text-sm text-muted-foreground mt-1">$12.00</div>
-                    <Button className="mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                    <Button variant="gradient" className="mt-4">
                       Purchase
                     </Button>
                   </div>

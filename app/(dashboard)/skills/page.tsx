@@ -20,7 +20,7 @@ export default function SkillsPage() {
           <h1 className="text-3xl font-bold tracking-tight">My Skills</h1>
           <p className="text-muted-foreground">Manage your teaching and learning skills.</p>
         </div>
-        <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+        <Button variant="gradient">
           <Plus className="mr-2 h-4 w-4" /> Add New Skill
         </Button>
       </div>

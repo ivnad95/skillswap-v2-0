@@ -153,7 +153,7 @@ export default function CommunityPage() {
                   <CardTitle>Discussion Forums</CardTitle>
                   <CardDescription>Join conversations with other members</CardDescription>
                 </div>
-                <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                <Button variant="gradient">
                   New Topic
                 </Button>
               </div>
@@ -207,7 +207,7 @@ export default function CommunityPage() {
                   <CardTitle>Upcoming Events</CardTitle>
                   <CardDescription>Workshops, meetups, and learning sessions</CardDescription>
                 </div>
-                <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                <Button variant="gradient">
                   Create Event
                 </Button>
               </div>
@@ -239,8 +239,8 @@ export default function CommunityPage() {
                         Details
                       </Button>
                       <Button
+                        variant="gradient"
                         size="sm"
-                        className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                       >
                         RSVP
                       </Button>
@@ -263,7 +263,7 @@ export default function CommunityPage() {
                   <CardTitle>Skill Groups</CardTitle>
                   <CardDescription>Join groups based on your interests</CardDescription>
                 </div>
-                <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                <Button variant="gradient">
                   Create Group
                 </Button>
               </div>
@@ -286,7 +286,7 @@ export default function CommunityPage() {
                       </Badge>
                     </CardContent>
                     <CardFooter>
-                      <Button className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                      <Button variant="gradient" className="w-full">
                         Join Group
                       </Button>
                     </CardFooter>
