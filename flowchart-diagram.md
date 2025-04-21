@@ -1,6 +1,6 @@
 ```mermaid
 %%{ init: { 'flowchart': { 'curve': 'basis', 'defaultRenderer': 'elk' } } }%%
-flowchart LR
+flowchart TD
     %% Title and Configuration
     title["<b>SkillSwap Application Architecture</b>"]:::title
     title -.- Root
