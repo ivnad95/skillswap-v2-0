@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ```mermaid
 %%{ init: { 'flowchart': { 'curve': 'basis', 'defaultRenderer': 'elk' } } }%%
 flowchart TD
@@ -140,6 +141,95 @@ flowchart TD
     Components --> LayoutComponents[Layout Components]
 
     %% UI Components
+=======
+flowchart TD
+    title["<b>SkillSwap Application Architecture</b>"]:::title
+    title -.- Root
+    subgraph Frontend
+        direction TB
+        Root[Root Layout] --> AuthProvider[Auth Provider]
+        AuthProvider --> ThemeProvider[Theme Provider]
+        ThemeProvider --> AppRoutes[App Routes]
+        AppRoutes --> PublicRoutes[Public Routes]
+        AppRoutes --> ProtectedRoutes[Protected Routes]
+        PublicRoutes --> HomePage[Home Page]
+        PublicRoutes --> AboutPage[About Page]
+        PublicRoutes --> ContactPage[Contact Page]
+        PublicRoutes --> FeaturesPage[Features Page]
+        PublicRoutes --> PricingPage[Pricing Page]
+        PublicRoutes --> LoginPage[Login Page]
+        PublicRoutes --> SignupPage[Signup Page]
+        PublicRoutes --> VerifyEmailPage[Verify Email Page]
+        ProtectedRoutes --> DashboardLayout[Dashboard Layout]
+        DashboardLayout --> DashboardPage[Dashboard Page]
+        DashboardLayout --> ExplorePage[Explore Page]
+        DashboardLayout --> SessionsPage[Sessions Page]
+        DashboardLayout --> MessagesPage[Messages Page]
+        DashboardLayout --> CommunityPage[Community Page]
+        DashboardLayout --> ProfilePage[Profile Page]
+        DashboardLayout --> SettingsPage[Settings Page]
+        DashboardLayout --> BillingPage[Billing Page]
+        DashboardLayout --> SkillsPage[Skills Page]
+        ProtectedRoutes --> OnboardingLayout[Onboarding Layout]
+        OnboardingLayout --> OnboardingPage[Onboarding Page]
+        OnboardingPage --> OnboardingComponent[Onboarding Component]
+        OnboardingComponent --> OnboardingSteps[Onboarding Steps]
+        OnboardingSteps --> WelcomeStep[Welcome Step]
+        OnboardingSteps --> PersonalInfoStep[Personal Info Step]
+        OnboardingSteps --> SkillsToTeachStep[Skills to Teach Step]
+        OnboardingSteps --> SkillsToLearnStep[Skills to Learn Step]
+        OnboardingSteps --> AvailabilityStep[Availability Step]
+        OnboardingSteps --> ProfilePhotoStep[Profile Photo Step]
+        OnboardingSteps --> CompleteStep[Complete Step]
+    end
+    subgraph Backend
+        direction TB
+        AppRoutes --> APIRoutes[API Routes]
+        APIRoutes --> AuthAPI[Auth API]
+        APIRoutes --> DbAPI[Database API]
+        APIRoutes --> ProfileAPI[Profile API]
+        APIRoutes --> SkillsAPI[Skills API]
+        APIRoutes --> SessionsAPI[Sessions API]
+        APIRoutes --> OnboardingAPI[Onboarding API]
+        APIRoutes --> AIAPI[AI API]
+        AuthAPI --> SigninRoute[Signin Route]
+        AuthAPI --> SignupRoute[Signup Route]
+        AuthAPI --> VerifyRoute[Verify Route]
+        AuthAPI --> VerifyEmailRoute[Verify Email Route]
+        AuthAPI --> ResetPasswordRoute[Reset Password Route]
+        AuthAPI --> UpdatePasswordRoute[Update Password Route]
+        AuthAPI --> UserRoute[User Route]
+        DbAPI --> QueryRoute[Query Route]
+        DbAPI --> InsertRoute[Insert Route]
+        DbAPI --> UpdateRoute[Update Route]
+        DbAPI --> DeleteRoute[Delete Route]
+        ProfileAPI --> ProfileRoute[Profile Route]
+        SkillsAPI --> SkillsRoute[Skills Route]
+        SkillsAPI --> SkillByIdRoute[Skill by ID Route]
+        SessionsAPI --> SessionsRoute[Sessions Route]
+        SessionsAPI --> SessionByIdRoute[Session by ID Route]
+        OnboardingAPI --> OnboardingCompleteRoute[Onboarding Complete Route]
+        OnboardingAPI --> OnboardingStatusRoute[Onboarding Status Route]
+        AIAPI --> AIAssistantRoute[AI Assistant Route]
+        AIAPI --> AISkillMatchingRoute[AI Skill Matching Route]
+        AIAPI --> AILearningRecommendationsRoute[AI Learning Recommendations Route]
+    end
+    subgraph Shared
+        Middleware[Middleware] --> AppRoutes
+        AuthContext[Auth Context] --> AuthProvider
+        OnboardingContext[Onboarding Context] --> OnboardingComponent
+        DbLibrary[Database Library] --> DbAPI
+        DbClientLibrary[Database Client Library] --> DbAPI
+        AuthUtilsLibrary[Auth Utils Library] --> AuthAPI
+        AISkillMatchingLibrary[AI Skill Matching Library] --> AIAPI
+        UtilsLibrary[Utils Library] --> Components
+        UseMobileHook[Use Mobile Hook] --> Components
+        UseToastHook[Use Toast Hook] --> Components
+        Components --> UIComponents[UI Components]
+        Components --> FeatureComponents[Feature Components]
+        Components --> LayoutComponents[Layout Components]
+    end
+>>>>>>> 7ee718ea65643186a686c1d9a09c8afbd99cca87
     UIComponents --> Button[Button]
     UIComponents --> Card[Card]
     UIComponents --> Input[Input]
@@ -166,14 +256,11 @@ flowchart TD
     UIComponents --> Logo[Logo]
     UIComponents --> Chart[Chart]
     UIComponents --> ThemeToggle[Theme Toggle]
-
-    %% Feature Components
     FeatureComponents --> AIGroup[AI Components]
     AIGroup --> AIAssistant[AI Assistant]
     AIGroup --> AISkillMatchingShowcase[AI Skill Matching Showcase]
     AIGroup --> LearningRecommendations[Learning Recommendations]
     AIGroup --> RecommendedMatches[Recommended Matches]
-
     FeatureComponents --> ProfileGroup[Profile Components]
     ProfileGroup --> ProfileEditModal[Profile Edit Modal]
     ProfileGroup --> ProfileHeader[Profile Header]
@@ -181,26 +268,20 @@ flowchart TD
     ProfileGroup --> UserMenu[User Menu]
     ProfileGroup --> AccountSettings[Account Settings]
     ProfileGroup --> NotificationSettings[Notification Settings]
-
     FeatureComponents --> SessionGroup[Session Components]
     SessionGroup --> AvailabilityCalendar[Availability Calendar]
     SessionGroup --> SessionHistory[Session History]
     SessionGroup --> UpcomingSession[Upcoming Session]
-
     FeatureComponents --> SkillGroup[Skill Components]
     SkillGroup --> SkillCard[Skill Card]
     SkillGroup --> SkillShowcase[Skill Showcase]
     SkillGroup --> ExploreSkillCard[Explore Skill Card]
     SkillGroup --> ExploreTeacherCard[Explore Teacher Card]
-
     FeatureComponents --> CommunicationGroup[Communication Components]
     CommunicationGroup --> MessagingInterface[Messaging Interface]
-
     FeatureComponents --> PaymentGroup[Payment Components]
     PaymentGroup --> TokenBalance[Token Balance]
     PaymentGroup --> PaymentSettings[Payment Settings]
-
-    %% Layout Components
     LayoutComponents --> MainNav[Main Nav]
     LayoutComponents --> MobileNav[Mobile Nav]
     LayoutComponents --> SidebarNav[Sidebar Nav]
@@ -210,10 +291,8 @@ flowchart TD
     DashboardHeader --> Sheet
     DashboardHeader --> SidebarNav
     DashboardHeader --> Logo
-
     LayoutComponents --> DashboardShell[Dashboard Shell]
     DashboardShell --> DashboardHeader
-
     LayoutComponents --> MarketingComponents[Marketing Components]
     MarketingComponents --> CTASection[CTA Section]
     MarketingComponents --> FeatureSection[Feature Section]
@@ -221,6 +300,7 @@ flowchart TD
     MarketingComponents --> PricingSection[Pricing Section]
     MarketingComponents --> ReviewsSection[Reviews Section]
     MarketingComponents --> TestimonialSection[Testimonial Section]
+<<<<<<< HEAD
 
     %% Component Relationships
     UpcomingSession --> Avatar
@@ -305,16 +385,14 @@ flowchart TD
     Transactions --> TokenBalance
 
     %% Style Definitions
+=======
+>>>>>>> 7ee718ea65643186a686c1d9a09c8afbd99cca87
     classDef title font-size:24px,fill:none,stroke:none,color:#333;
     classDef primary fill:#4f46e5,stroke:#4338ca,color:white,stroke-width:2px;
     classDef secondary fill:#8b5cf6,stroke:#7c3aed,color:white,stroke-width:2px;
     classDef success fill:#10b981,stroke:#059669,color:white,stroke-width:2px;
-    classDef danger fill:#ef4444,stroke:#dc2626,color:white,stroke-width:2px;
-    classDef warning fill:#f59e0b,stroke:#d97706,color:white,stroke-width:2px;
-    classDef info fill:#3b82f6,stroke:#2563eb,color:white,stroke-width:2px;
-    classDef database fill:#6b7280,stroke:#4b5563,color:white,stroke-width:2px;
-    classDef component fill:#ec4899,stroke:#db2777,color:white,stroke-width:2px;
     classDef api fill:#14b8a6,stroke:#0d9488,color:white,stroke-width:2px;
+<<<<<<< HEAD
     classDef layout fill:#f97316,stroke:#ea580c,color:white,stroke-width:2px;
     classDef uicomponent fill:#ec4899,stroke:#db2777,color:white,stroke-width:2px;
     classDef featurecomponent fill:#8b5cf6,stroke:#7c3aed,color:white,stroke-width:2px;
@@ -327,28 +405,10 @@ flowchart TD
     class HomePage,AboutPage,ContactPage,FeaturesPage,PricingPage,LoginPage,SignupPage,VerifyEmailPage info;
     class DashboardLayout,DashboardPage,ExplorePage,SessionsPage,MessagesPage,CommunityPage,ProfilePage,SettingsPage,BillingPage,SkillsPage layout;
     class OnboardingLayout,OnboardingPage,OnboardingComponent,OnboardingSteps,WelcomeStep,PersonalInfoStep,SkillsToTeachStep,SkillsToLearnStep,AvailabilityStep,ProfilePhotoStep,CompleteStep success;
+=======
+    class title title;
+    class Root,AuthProvider,ThemeProvider,AppRoutes primary;
+    class PublicRoutes,ProtectedRoutes,APIRoutes secondary;
+    class DashboardLayout,DashboardPage,ExplorePage,SessionsPage,MessagesPage,CommunityPage,ProfilePage,SettingsPage,BillingPage,SkillsPage success;
+>>>>>>> 7ee718ea65643186a686c1d9a09c8afbd99cca87
     class AuthAPI,DbAPI,ProfileAPI,SkillsAPI,SessionsAPI,OnboardingAPI,AIAPI api;
-    class SigninRoute,SignupRoute,VerifyRoute,VerifyEmailRoute,ResetPasswordRoute,UpdatePasswordRoute,UserRoute,QueryRoute,InsertRoute,UpdateRoute,DeleteRoute,ProfileRoute,SkillsRoute,SkillByIdRoute,SessionsRoute,SessionByIdRoute,OnboardingCompleteRoute,OnboardingStatusRoute,AIAssistantRoute,AISkillMatchingRoute,AILearningRecommendationsRoute api;
-    class Database,Users,Profiles,Skills,Sessions,Transactions,Ratings,Communities,CommunityPosts,EmailVerificationTokens,PasswordResetTokens database;
-    class UIComponents,FeatureComponents,LayoutComponents,Components secondary;
-
-    %% UI Components
-    class Button,Card,Input,Avatar,Dialog,DropdownMenu,Form,Select,Tabs,Toast,Toaster,Badge,Calendar,Checkbox,Command,Label,Menubar,Popover,Sheet,Textarea,Progress,Alert,Skeleton,Logo,Chart,ThemeToggle uicomponent;
-
-    %% Feature Components
-    class AIGroup,ProfileGroup,SessionGroup,SkillGroup,CommunicationGroup,PaymentGroup,MarketingComponents featurecomponent;
-    class AIAssistant,AISkillMatchingShowcase,LearningRecommendations,RecommendedMatches featurecomponent;
-    class ProfileEditModal,ProfileHeader,ProfileStats,UserMenu,AccountSettings,NotificationSettings featurecomponent;
-    class AvailabilityCalendar,SessionHistory,UpcomingSession featurecomponent;
-    class SkillCard,SkillShowcase,ExploreSkillCard,ExploreTeacherCard featurecomponent;
-    class MessagingInterface featurecomponent;
-    class TokenBalance,PaymentSettings featurecomponent;
-
-    %% Layout Components
-    class MainNav,MobileNav,SidebarNav,SiteFooter,DashboardHeader,DashboardShell layoutcomponent;
-    class CTASection,FeatureSection,HeroSection,PricingSection,ReviewsSection,TestimonialSection layoutcomponent;
-
-    %% Auth and Token Flow
-    class JWT,AuthCookie,EarnTokens,SpendTokens warning;
-    class DashboardPageClient,AIModels primary;
-```
