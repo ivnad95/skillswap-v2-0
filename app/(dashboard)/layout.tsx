@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
@@ -56,7 +57,13 @@ export default function DashboardLayout({
           </nav>
         </div>
       </header>
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        {children}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold">Component Diagram</h2>
+          <img src="/docs/component-diagram.png" alt="Component Diagram" className="mt-4" />
+        </div>
+      </main>
     </div>
   )
 }
