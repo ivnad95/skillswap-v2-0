@@ -1,13 +1,9 @@
 ```mermaid
-<<<<<<< HEAD
 %%{ init: { 'flowchart': { 'curve': 'basis', 'defaultRenderer': 'elk' } } }%%
-flowchart LR
+flowchart TD
     %% Title and Configuration
     title["<b>SkillSwap Application Architecture</b>"]:::title
     title -.- Root
-=======
-flowchart TD
->>>>>>> 9da941a6c20fa535f4e06d2254bc17190774e553
     %% Main Application Structure
     Root[Root Layout] --> AuthProvider[Auth Provider]
     AuthProvider --> ThemeProvider[Theme Provider]
@@ -309,7 +305,6 @@ flowchart TD
     Transactions --> TokenBalance
 
     %% Style Definitions
-<<<<<<< HEAD
     classDef title font-size:24px,fill:none,stroke:none,color:#333;
     classDef primary fill:#4f46e5,stroke:#4338ca,color:white,stroke-width:2px;
     classDef secondary fill:#8b5cf6,stroke:#7c3aed,color:white,stroke-width:2px;
@@ -324,23 +319,9 @@ flowchart TD
     classDef uicomponent fill:#ec4899,stroke:#db2777,color:white,stroke-width:2px;
     classDef featurecomponent fill:#8b5cf6,stroke:#7c3aed,color:white,stroke-width:2px;
     classDef layoutcomponent fill:#f97316,stroke:#ea580c,color:white,stroke-width:2px;
-=======
-    classDef primary fill:#4f46e5,stroke:#4338ca,color:white;
-    classDef secondary fill:#8b5cf6,stroke:#7c3aed,color:white;
-    classDef success fill:#10b981,stroke:#059669,color:white;
-    classDef danger fill:#ef4444,stroke:#dc2626,color:white;
-    classDef warning fill:#f59e0b,stroke:#d97706,color:white;
-    classDef info fill:#3b82f6,stroke:#2563eb,color:white;
-    classDef database fill:#6b7280,stroke:#4b5563,color:white;
-    classDef component fill:#ec4899,stroke:#db2777,color:white;
-    classDef api fill:#14b8a6,stroke:#0d9488,color:white;
-    classDef layout fill:#f97316,stroke:#ea580c,color:white;
-    classDef uicomponent fill:#ec4899,stroke:#db2777,color:white;
-    classDef featurecomponent fill:#8b5cf6,stroke:#7c3aed,color:white;
-    classDef layoutcomponent fill:#f97316,stroke:#ea580c,color:white;
->>>>>>> 9da941a6c20fa535f4e06d2254bc17190774e553
 
     %% Apply Styles
+    class title title;
     class Root,AuthProvider,ThemeProvider,AppRoutes,Middleware primary;
     class PublicRoutes,ProtectedRoutes,APIRoutes,AuthContext,OnboardingContext secondary;
     class HomePage,AboutPage,ContactPage,FeaturesPage,PricingPage,LoginPage,SignupPage,VerifyEmailPage info;
