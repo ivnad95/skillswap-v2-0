@@ -37,7 +37,7 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
   const [welcomeMessage, setWelcomeMessage] = useState<string>("")
   const [aiRecommendations, setAiRecommendations] = useState<string[]>([])
   const [isAiLoading, setIsAiLoading] = useState<boolean>(true)
-  
+
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !user) {
@@ -49,12 +49,12 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
   useEffect(() => {
     async function loadAiContent() {
       if (!userData) return
-      
+
       try {
         // Get personalized welcome message
         const message = await aiModels.getPersonalizedWelcome(userData)
         setWelcomeMessage(message)
-        
+
         // In a real implementation, we would get AI recommendations from the API
         // For now, we'll use static recommendations
         setAiRecommendations([
@@ -69,7 +69,7 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
         setIsAiLoading(false)
       }
     }
-    
+
     loadAiContent()
   }, [userData])
 
@@ -218,7 +218,7 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
                     <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500" style={{ width: '75%' }}></div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>UX Design</span>
@@ -271,6 +271,9 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
           </Card>
         </div>
       </div>
+
+      {/* AI Assistant component (fixed position) */}
+      <AIAssistant />
 
       <div className="mt-8">
         <h2 className="text-2xl font-bold">Component Diagram</h2>
