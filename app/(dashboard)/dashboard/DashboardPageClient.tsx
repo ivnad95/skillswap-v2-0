@@ -36,16 +36,11 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
   const router = useRouter()
   const [welcomeMessage, setWelcomeMessage] = useState<string>("")
   const [aiRecommendations, setAiRecommendations] = useState<string[]>([])
-  const [isAiLoading, setIsAiLoading] = useState<boolean>(true)
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push("/login?redirect=/dashboard")
-    }
-  }, [user, isLoading, router])
-
-  // Load personalized AI content when component mounts
+   const [isAiLoading, setIsAiLoading] = useState<boolean>(true)
+ 
+   // Removed redundant auth check useEffect, as it's handled by parent/layout
+ 
+   // Load personalized AI content when component mounts
   useEffect(() => {
     async function loadAiContent() {
       if (!userData) return
@@ -61,12 +56,14 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
           "Based on your JavaScript skills, try exploring React for frontend development",
           "Connect with Sarah J. who matches 92% with your learning preferences",
           "Complete your skill profile to improve your matching accuracy",
-          "Schedule your first teaching session to earn SkillTokens"
-        ])
-      } catch (error) {
-        console.error("Error loading AI content:", error)
-      } finally {
-        setIsAiLoading(false)
+           "Schedule your first teaching session to earn SkillTokens"
+         ])
+         // TODO: Replace static AI recommendations with dynamic data fetching
+       } catch (error) {
+         // console.error("Error loading AI content:", error) // Removed console.error
+         // Optionally add user-facing error handling here
+       } finally {
+         setIsAiLoading(false)
       }
     }
 
@@ -107,12 +104,12 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
               AI Insights
             </CardTitle>
             <CardDescription>Personalized recommendations based on your profile</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {aiRecommendations.map((recommendation, index) => (
-                <li key={index} className="flex items-start gap-2 text-sm">
-                  <div className="mt-0.5 rounded-full bg-purple-800/30 p-1">
+           </CardHeader>
+           <CardContent>
+             <ul className="space-y-2">
+               {aiRecommendations.map((recommendation: string, index: number) => ( // Added types
+                 <li key={index} className="flex items-start gap-2 text-sm">
+                   <div className="mt-0.5 rounded-full bg-purple-800/30 p-1">
                     <Sparkles className="h-3 w-3 text-purple-400" />
                   </div>
                   {recommendation}
@@ -135,12 +132,12 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
                 View All
               </Button>
             </CardHeader>
-            <CardContent>
-              {upcomingSessions && upcomingSessions.length > 0 ? (
-                <div className="space-y-4">
-                  {upcomingSessions.map((session, index) => (
-                    <UpcomingSession
-                      key={index}
+             <CardContent>
+               {upcomingSessions && upcomingSessions.length > 0 ? (
+                 <div className="space-y-4">
+                   {upcomingSessions.map((session: any, index: number) => ( // Added type (any for now)
+                     <UpcomingSession
+                       key={index} // Consider using session.id if available and unique
                       title={session.title}
                       role={session.role}
                       with={session.with}
@@ -168,12 +165,12 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
                 View All
               </Button>
             </CardHeader>
-            <CardContent>
-              {skills && skills.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {skills.slice(0, 4).map((skill, index) => (
-                    <SkillCard
-                      key={index}
+             <CardContent>
+               {skills && skills.length > 0 ? (
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                   {skills.slice(0, 4).map((skill: any, index: number) => ( // Added type (any for now)
+                     <SkillCard
+                       key={index} // Consider using skill.id if available and unique
                       title={skill.title}
                       type={skill.type}
                       level={skill.level}
@@ -272,13 +269,10 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
         </div>
       </div>
 
-      {/* AI Assistant component (fixed position) */}
-      <AIAssistant />
-
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold">Component Diagram</h2>
-        <img src="/docs/component-diagram.png" alt="Component Diagram" className="mt-4" />
-      </div>
-    </div>
+       {/* AI Assistant component (fixed position) */}
+       <AIAssistant />
+ 
+       {/* Removed placeholder Component Diagram section */}
+     </div>
   )
 }

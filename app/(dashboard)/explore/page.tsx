@@ -37,68 +37,8 @@ interface ExtendedSkillData extends SkillData {
   teacherAvatar: string;
   rating: number;
   students: number;
-  tokens: number;
-}
-
-// Mock functions to replace the missing getSkills and getTeachers
-async function getSkills({ search }: { search: string }) {
-  // This is a placeholder - in a real implementation, you would fetch from your API
-  const mockSkills: ExtendedSkillData[] = [
-    {
-      id: "1",
-      userId: "user1",
-      title: "JavaScript Programming",
-      name: "JavaScript Programming",
-      type: "teaching",
-      level: "Intermediate",
-      rate: 50,
-      description: "Learn JavaScript from the basics to advanced concepts",
-      tags: ["programming", "web", "frontend"],
-      category: "Programming",
-      teacherName: "John Doe",
-      teacherAvatar: "/placeholder-user.jpg",
-      rating: 4.8,
-      students: 24,
-      tokens: 50,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    },
-    {
-      id: "2",
-      userId: "user2",
-      title: "UI/UX Design",
-      name: "UI/UX Design",
-      type: "teaching",
-      level: "Beginner",
-      rate: 40,
-      description: "Learn the principles of good UI/UX design",
-      tags: ["design", "ui", "ux"],
-      category: "Design",
-      teacherName: "Jane Smith",
-      teacherAvatar: "/placeholder-user.jpg",
-      rating: 4.6,
-      students: 18,
-      tokens: 40,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-  ];
-
-  // Filter by search term if provided
-  if (search) {
-    const searchLower = search.toLowerCase();
-    return mockSkills.filter(skill =>
-      skill.title.toLowerCase().includes(searchLower) ||
-      (skill.description && skill.description.toLowerCase().includes(searchLower))
-    );
-  }
-
-  return mockSkills;
-}
-
-async function getTeachers({ search }: { search: string }) {
-  // This is a placeholder - in a real implementation, you would fetch from your API
-  return [] as PopulatedTeacher[];
+  // Removed ExtendedSkillData as API structure might differ
+  // Removed mock getSkills and getTeachers functions
 }
 
 // Skeleton loader components for loading states
@@ -157,16 +97,31 @@ export default async function ExplorePage({
     let isLoading = true;
     let error: string | null = null;
 
+    // Fetch data on the server side
+    // Note: This component runs on the server, so we fetch directly
+    // If client-side fetching with useEffect is needed, convert to "use client"
     try {
-        // Example: Fetch skills and teachers based on search query
-        // You'll need to implement filtering/searching logic in getSkills/getTeachers
-        [skills, teachers] = await Promise.all([
-            getSkills({ search: searchQuery }), // Implement getSkills in lib/db.ts
-            getTeachers({ search: searchQuery }), // Implement getTeachers in lib/db.ts
-        ]);
+        // Fetch skills
+        const skillsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/skills?search=${encodeURIComponent(searchQuery)}`);
+        if (!skillsResponse.ok) {
+            const skillsError = await skillsResponse.json();
+            throw new Error(skillsError.message || skillsError.error || 'Failed to load skills');
+        }
+        const skillsData = await skillsResponse.json();
+        skills = skillsData.skills || skillsData || []; // Adjust based on actual API response structure
+
+        // TODO: Fetch teachers when API endpoint is available
+        // const teachersResponse = await fetch(`/api/teachers?search=${encodeURIComponent(searchQuery)}`);
+        // if (!teachersResponse.ok) throw new Error('Failed to load teachers');
+        // const teachersData = await teachersResponse.json();
+        // teachers = teachersData.teachers || [];
+        teachers = []; // Keep teachers empty for now
+
         isLoading = false;
     } catch (err) {
         console.error("Failed to fetch explore data:", err);
+        // Ensure err is an Error object before accessing message
+        error = err instanceof Error ? err.message : "Failed to load data. Please try again later.";
         error = "Failed to load data. Please try again later.";
         isLoading = false;
     }
@@ -217,23 +172,20 @@ export default async function ExplorePage({
                             ))
                         ) : skills.length > 0 ? (
                             // Render actual skill cards when data is available
-                            skills.map((skill) => {
-                                // Cast to ExtendedSkillData to access UI-specific fields
-                                const extendedSkill = skill as ExtendedSkillData;
-                                return (
-                                    <ExploreSkillCard
-                                        key={extendedSkill.id}
-                                        title={extendedSkill.name}
-                                        category={extendedSkill.category}
-                                        teacherName={extendedSkill.teacherName}
-                                        teacherAvatar={extendedSkill.teacherAvatar}
-                                        rating={extendedSkill.rating}
-                                        students={extendedSkill.students}
-                                        tokens={extendedSkill.tokens}
-                                        tags={extendedSkill.tags}
-                                    />
-                                );
-                            })
+                            // Adjust props based on the actual SkillData structure from API/lib/db.ts
+                            skills.map((skill) => (
+                                <ExploreSkillCard
+                                    key={skill.id}
+                                    title={skill.title} // Use title from SkillData
+                                    category={"Unknown"} // Placeholder - category not in SkillData
+                                    teacherName={"Unknown Teacher"} // Placeholder - teacher info not directly in SkillData
+                                    teacherAvatar={"/placeholder-user.jpg"} // Placeholder
+                                    rating={0} // Placeholder - rating not in SkillData
+                                    students={0} // Placeholder - student count not in SkillData
+                                    tokens={skill.rate || 0} // Use rate as tokens? Or adjust based on API
+                                    tags={skill.tags || []}
+                                />
+                            ))
                         ) : (
                             // Empty state when no skills match the search
                             <div className="col-span-full text-center py-12">

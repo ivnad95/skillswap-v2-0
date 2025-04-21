@@ -16,7 +16,6 @@ export type User = {
 type AuthContextType = {
   user: User | null
   loading: boolean
-  isLoading: boolean
   signIn: (email: string, password: string, redirectTo?: string) => Promise<{ error?: { message: string } }>
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error?: { message: string }, needsEmailVerification?: boolean }>
   signOut: () => Promise<void>
@@ -70,7 +69,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
       } catch (error) {
-        console.error('Error loading user from cookies:', error)
         setUser(null)
       } finally {
         setLoading(false)
@@ -83,7 +81,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Sign in function
   const signIn = async (email: string, password: string, redirectTo?: string) => {
     try {
-      console.log('Signing in with:', email)
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: {
@@ -93,20 +90,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
 
       const data = await res.json()
-      console.log('Sign in response:', data)
 
       if (data.error) {
-        console.error('Sign in error:', data.error)
         return { error: data.error }
       }
 
       // Set the user in state
       setUser(data.user)
-      console.log('User set in state:', data.user)
 
       // Set the token in cookies
       Cookies.set('auth-token', data.token, { expires: 7 }) // 7 days
-      console.log('Token set in cookies')
 
       // Check if the user has completed onboarding
       try {
@@ -121,25 +114,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // If onboarding is not completed, redirect to onboarding
         if (!onboardingData.completed) {
-          console.log('Onboarding not completed, redirecting to onboarding')
           window.location.href = '/onboarding'
           return {}
         }
       } catch (error) {
-        console.error('Error checking onboarding status:', error)
         // Continue with normal flow if there's an error checking onboarding status
       }
 
       // Redirect if a redirect path is provided
       if (redirectTo) {
-        console.log('Redirecting to:', redirectTo)
         // Use window.location for a hard redirect
         window.location.href = redirectTo
       }
 
       return {}
     } catch (error) {
-      console.error('Error signing in:', error)
       return { error: { message: 'An unexpected error occurred' } }
     }
   }
@@ -168,7 +157,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return {}
     } catch (error) {
-      console.error('Error signing up:', error)
       return { error: { message: 'An unexpected error occurred' } }
     }
   }
@@ -188,7 +176,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Redirect to home page
       router.push('/')
     } catch (error) {
-      console.error('Error signing out:', error)
     }
   }
 
@@ -211,7 +198,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return {}
     } catch (error) {
-      console.error('Error resetting password:', error)
       return { error: { message: 'An unexpected error occurred' } }
     }
   }
@@ -239,16 +225,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return {}
     } catch (error) {
-      console.error('Error updating password:', error)
       return { error: { message: 'An unexpected error occurred' } }
     }
   }
 
   // Create the context value
-  const value = {
+  const value: AuthContextType = { // Add explicit type annotation
     user,
     loading,
-    isLoading: loading, // Alias for compatibility
     signIn,
     signUp,
     signOut,

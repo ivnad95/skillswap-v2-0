@@ -108,56 +108,51 @@ export function LearningRecommendations() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"recommendations" | "path">("recommendations")
 
-  // Use sample data instead of API call for now
   useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true)
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        setRecommendations(sampleRecommendations)
-      } catch (error) {
-        setError("Failed to load recommendations")
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadData()
-  }, [])
+    // Fetch recommendations when the component mounts
+    getRecommendations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const getRecommendations = async () => {
     setIsLoading(true)
     setError(null)
 
     try {
-      // For demo purposes, just use the sample data
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setRecommendations(sampleRecommendations)
+      // TODO: Fetch actual userProfile, learningHistory, and goals data here
+      // const profileRes = await fetch('/api/profile');
+      // const historyRes = await fetch('/api/sessions?status=completed'); // Example
+      // const goalsRes = await fetch('/api/goals'); // Example
+      // const userProfile = await profileRes.json();
+      // const learningHistory = await historyRes.json();
+      // const goals = await goalsRes.json();
 
-      // Uncomment this for actual API integration
-      /*
+      // Using sample data for the request body for now
+      const requestBody = {
+        userProfile: sampleUserProfile,
+        learningHistory: sampleLearningHistory,
+        goals: sampleGoals,
+      };
+
       const response = await fetch("/api/ai-learning-recommendations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userProfile: sampleUserProfile,
-          learningHistory: sampleLearningHistory,
-          goals: sampleGoals,
-        }),
+        body: JSON.stringify(requestBody), // Use the prepared request body
       })
 
       if (!response.ok) {
-        throw new Error("Failed to get recommendations")
+        const errorData = await response.json();
+        throw new Error(errorData.message || errorData.error || "Failed to get recommendations");
       }
 
-      const data = await response.json()
-      setRecommendations(data)
-      */
+      const data = await response.json();
+      // Assuming API returns the structure matching RecommendationsResponse
+      setRecommendations(data);
+
     } catch (error) {
-      console.error("Error getting recommendations:", error)
+      console.error("Error getting recommendations:", error);
       setError("Failed to generate recommendations. Please try again later.")
     } finally {
       setIsLoading(false)

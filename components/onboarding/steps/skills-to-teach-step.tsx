@@ -47,34 +47,37 @@ export function SkillsToTeachStep() {
     Array<{
       skill: string
       level: string
-      description: string
-    }>
-  >(onboardingData.skillsToTeach || [])
-
-  const handleAddSkill = () => {
-    const skillName = selectedSkill || customSkill
+       description: string
+     }>
+   >(onboardingData.skillsToTeach || [])
+ 
+   // Define Skill type for clarity
+   type SkillEntry = { skill: string; level: string; description: string };
+ 
+   const handleAddSkill = () => {
+     const skillName = selectedSkill || customSkill
 
     if (!skillName) return
 
     const newSkill = {
       skill: skillName,
       level: proficiencyLevel,
-      description: skillDescription,
-    }
-
-    setSkillsToTeach((prev) => [...prev, newSkill])
-
-    // Reset form
+       description: skillDescription,
+     }
+ 
+     setSkillsToTeach((prev: SkillEntry[]) => [...prev, newSkill])
+ 
+     // Reset form
     setSelectedSkill("")
     setCustomSkill("")
     setSkillDescription("")
     setProficiencyLevel("intermediate")
-  }
-
-  const handleRemoveSkill = (index: number) => {
-    setSkillsToTeach((prev) => prev.filter((_, i) => i !== index))
-  }
-
+   }
+ 
+   const handleRemoveSkill = (index: number) => {
+     setSkillsToTeach((prev: SkillEntry[]) => prev.filter((_: SkillEntry, i: number) => i !== index))
+   }
+ 
   const handleContinue = () => {
     updateOnboardingData({ skillsToTeach })
     goToNextStep()
@@ -98,19 +101,19 @@ export function SkillsToTeachStep() {
         {/* Current skills list */}
         {skillsToTeach.length > 0 && (
           <div className="space-y-3">
-            <Label>Your Teaching Skills</Label>
-            <div className="grid gap-2 md:grid-cols-2">
-              {skillsToTeach.map((skill, index) => (
-                <div
-                  key={index}
+             <Label>Your Teaching Skills</Label>
+             <div className="grid gap-2 md:grid-cols-2">
+               {skillsToTeach.map((skill: SkillEntry, index: number) => (
+                 <div
+                   key={index}
                   className="flex items-center justify-between p-3 rounded-md bg-white/10 dark:bg-card/20 backdrop-blur-sm border border-white/10"
                 >
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{skill.skill}</span>
-                      <Badge variant="glass" className="capitalize">
-                        {skill.level}
-                      </Badge>
+                     <div className="flex items-center gap-2">
+                       <span className="font-medium">{skill.skill}</span>
+                       <Badge variant="outline" className="capitalize"> {/* Changed variant from glass to outline */}
+                         {skill.level}
+                       </Badge>
                     </div>
                     {skill.description && (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{skill.description}</p>
@@ -134,12 +137,12 @@ export function SkillsToTeachStep() {
               <Label htmlFor="category">Skill Category</Label>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {skillCategories.map((category) => (
-                    <SelectItem key={category.name} value={category.name}>
-                      {category.name}
+                   <SelectValue placeholder="Select category" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   {skillCategories.map((category: { name: string; skills: string[] }) => (
+                     <SelectItem key={category.name} value={category.name}>
+                       {category.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -151,24 +154,24 @@ export function SkillsToTeachStep() {
               {selectedCategory ? (
                 <Select value={selectedSkill} onValueChange={setSelectedSkill}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select skill" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categorySkills.map((skill) => (
-                      <SelectItem key={skill} value={skill}>
-                        {skill}
+                     <SelectValue placeholder="Select skill" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     {categorySkills.map((skill: string) => (
+                       <SelectItem key={skill} value={skill}>
+                         {skill}
                       </SelectItem>
                     ))}
                     <SelectItem value="custom">Custom skill...</SelectItem>
                   </SelectContent>
                 </Select>
               ) : (
-                <Input
-                  id="customSkill"
-                  value={customSkill}
-                  onChange={(e) => setCustomSkill(e.target.value)}
-                  placeholder="Enter your skill"
-                />
+                 <Input
+                   id="customSkill"
+                   value={customSkill}
+                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomSkill(e.target.value)}
+                   placeholder="Enter your skill"
+                 />
               )}
             </div>
           </div>
@@ -176,12 +179,12 @@ export function SkillsToTeachStep() {
           {selectedSkill === "custom" && (
             <div className="space-y-2">
               <Label htmlFor="customSkill">Custom Skill Name</Label>
-              <Input
-                id="customSkill"
-                value={customSkill}
-                onChange={(e) => setCustomSkill(e.target.value)}
-                placeholder="Enter your custom skill"
-              />
+               <Input
+                 id="customSkill"
+                 value={customSkill}
+                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomSkill(e.target.value)}
+                 placeholder="Enter your custom skill"
+               />
             </div>
           )}
 
@@ -203,11 +206,11 @@ export function SkillsToTeachStep() {
           <div className="space-y-2">
             <Label htmlFor="description">Brief Description</Label>
             <Textarea
-              id="description"
-              value={skillDescription}
-              onChange={(e) => setSkillDescription(e.target.value)}
-              placeholder="Describe your experience with this skill and how you can teach it"
-              className="resize-none"
+               id="description"
+               value={skillDescription}
+               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setSkillDescription(e.target.value)}
+               placeholder="Describe your experience with this skill and how you can teach it"
+               className="resize-none"
               rows={3}
             />
           </div>

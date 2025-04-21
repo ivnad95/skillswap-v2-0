@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createBrowserDbClient } from '@/lib/db-client';
+// Removed unused createBrowserDbClient import
 
 // Define which routes require authentication
 const protectedRoutes = [
@@ -41,10 +41,8 @@ export async function middleware(request: NextRequest) {
   // Extract auth token directly from cookies
   const cookieHeader = request.headers.get("cookie") || ""
   const authToken = cookieHeader.split(';')
-    .map(cookie => cookie.trim().split('='))
-    .find(([key]) => key === 'auth-token')?.[1]
-
-  console.log('Auth token from cookies:', authToken ? 'Found' : 'Not found')
+    .map((cookie: string) => cookie.trim().split('=')) // Add type for 'cookie'
+    .find(([key]: [string]) => key === 'auth-token')?.[1] // Add type for '[key]'
 
   // Check if the user is authenticated
   let hasSession = false
@@ -53,40 +51,17 @@ export async function middleware(request: NextRequest) {
   // Instead, we'll just check if the token exists
   // The actual verification will happen in the API routes
   hasSession = !!authToken
-  console.log('Session status based on token presence:', hasSession ? 'Authenticated' : 'Not authenticated')
 
   // If there's no session and the route is protected, redirect to login
   if (!hasSession && isProtectedRoute) {
-    console.log('No session, redirecting to login from:', pathname)
     const redirectUrl = new URL("/login", request.url)
     redirectUrl.searchParams.set("redirect", pathname + search)
-    console.log('Redirect URL:', redirectUrl.toString())
     return NextResponse.redirect(redirectUrl)
   }
 
-  // If there's a session and the route is auth-only, redirect to dashboard or onboarding
+  // If there's a session and the route is auth-only (e.g., /login, /signup),
+  // redirect the user to the dashboard as they are already authenticated.
   if (hasSession && isAuthRoute) {
-    // Check if there's a redirect parameter in the URL
-    const url = new URL(request.url)
-    const redirectTo = url.searchParams.get("redirect")
-
-    if (redirectTo) {
-      // Redirect to the specified path
-      return NextResponse.redirect(new URL(redirectTo, request.url))
-    }
-
-    // Check if the user has completed onboarding
-    // We'll use a cookie to track onboarding status in the middleware
-    // The actual check happens in the API routes
-    const onboardingCompleted = request.cookies.get('onboarding-completed')?.value === 'true'
-
-    // If onboarding is not completed, redirect to onboarding
-    if (!onboardingCompleted && isProtectedRoute) {
-      console.log('Onboarding not completed, redirecting to onboarding')
-      return NextResponse.redirect(new URL("/onboarding", request.url))
-    }
-
-    // Default redirect to dashboard
     return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 
@@ -103,26 +78,8 @@ export async function middleware(request: NextRequest) {
 
       // If onboarding is not completed, redirect to onboarding
       if (!onboardingCompleted) {
-        console.log('Onboarding not completed, redirecting to onboarding')
         return NextResponse.redirect(new URL("/onboarding", request.url))
       }
-    }
-  }
-
-  // Get the auth cookie header
-  const authCookie = request.headers.get('cookie') || '';
-  
-  // For protected routes, check authentication
-  if (request.nextUrl.pathname.startsWith('/protected')) {
-    try {
-      const { auth } = createBrowserDbClient(authCookie);
-      const { data: user } = await auth.getUser();
-      
-      if (!user) {
-        return NextResponse.redirect(new URL('/login', request.url));
-      }
-    } catch (error) {
-      return NextResponse.redirect(new URL('/login', request.url));
     }
   }
 
@@ -140,6 +97,6 @@ export const config = {
      * - public folder
      */
     "/((?!_next/static|_next/image|favicon.ico|public/).*)",
-    '/protected/:path*'
+    // Removed '/protected/:path*' matcher as the corresponding logic was removed
   ],
 }

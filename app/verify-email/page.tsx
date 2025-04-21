@@ -51,7 +51,7 @@ export default function VerifyEmailPage() {
           setError("Invalid verification type")
         }
       } catch (err) {
-        console.error("Verification error:", err)
+        // console.error("Verification error:", err) // Removed console.error
         setError("An error occurred during verification")
       } finally {
         setVerifying(false)

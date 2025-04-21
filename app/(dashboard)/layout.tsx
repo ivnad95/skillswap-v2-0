@@ -56,14 +56,11 @@ export default function DashboardLayout({
             </div>
           </nav>
         </div>
-      </header>
-      <main className="flex-1">
-        {children}
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold">Component Diagram</h2>
-          <img src="/docs/component-diagram.png" alt="Component Diagram" className="mt-4" />
-        </div>
-      </main>
-    </div>
+       </header>
+       <main className="flex-1">
+         {children}
+         {/* Removed placeholder Component Diagram section */}
+       </main>
+     </div>
   )
 }

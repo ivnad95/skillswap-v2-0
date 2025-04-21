@@ -47,34 +47,37 @@ export function SkillsToLearnStep() {
     Array<{
       skill: string
       currentLevel: string
-      goal: string
-    }>
-  >(onboardingData.skillsToLearn || [])
-
-  const handleAddSkill = () => {
-    const skillName = selectedSkill || customSkill
+       goal: string
+     }>
+   >(onboardingData.skillsToLearn || [])
+ 
+   // Define Skill type for clarity
+   type SkillEntry = { skill: string; currentLevel: string; goal: string };
+ 
+   const handleAddSkill = () => {
+     const skillName = selectedSkill || customSkill
 
     if (!skillName) return
 
     const newSkill = {
       skill: skillName,
       currentLevel: currentLevel,
-      goal: learningGoal,
-    }
-
-    setSkillsToLearn((prev) => [...prev, newSkill])
-
-    // Reset form
+       goal: learningGoal,
+     }
+ 
+     setSkillsToLearn((prev: SkillEntry[]) => [...prev, newSkill])
+ 
+     // Reset form
     setSelectedSkill("")
     setCustomSkill("")
     setLearningGoal("")
     setCurrentLevel("beginner")
-  }
-
-  const handleRemoveSkill = (index: number) => {
-    setSkillsToLearn((prev) => prev.filter((_, i) => i !== index))
-  }
-
+   }
+ 
+   const handleRemoveSkill = (index: number) => {
+     setSkillsToLearn((prev: SkillEntry[]) => prev.filter((_: SkillEntry, i: number) => i !== index))
+   }
+ 
   const handleContinue = () => {
     updateOnboardingData({ skillsToLearn })
     goToNextStep()
@@ -98,19 +101,19 @@ export function SkillsToLearnStep() {
         {/* Current skills list */}
         {skillsToLearn.length > 0 && (
           <div className="space-y-3">
-            <Label>Your Learning Interests</Label>
-            <div className="grid gap-2 md:grid-cols-2">
-              {skillsToLearn.map((skill, index) => (
-                <div
-                  key={index}
+             <Label>Your Learning Interests</Label>
+             <div className="grid gap-2 md:grid-cols-2">
+               {skillsToLearn.map((skill: SkillEntry, index: number) => (
+                 <div
+                   key={index}
                   className="flex items-center justify-between p-3 rounded-md bg-white/10 dark:bg-card/20 backdrop-blur-sm border border-white/10"
                 >
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{skill.skill}</span>
-                      <Badge variant="glass" className="capitalize">
-                        {skill.currentLevel}
-                      </Badge>
+                     <div className="flex items-center gap-2">
+                       <span className="font-medium">{skill.skill}</span>
+                       <Badge variant="outline" className="capitalize"> {/* Changed variant from glass to outline */}
+                         {skill.currentLevel}
+                       </Badge>
                     </div>
                     {skill.goal && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{skill.goal}</p>}
                   </div>
@@ -132,12 +135,12 @@ export function SkillsToLearnStep() {
               <Label htmlFor="category">Skill Category</Label>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {skillCategories.map((category) => (
-                    <SelectItem key={category.name} value={category.name}>
-                      {category.name}
+                   <SelectValue placeholder="Select category" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   {skillCategories.map((category: { name: string; skills: string[] }) => (
+                     <SelectItem key={category.name} value={category.name}>
+                       {category.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -149,24 +152,24 @@ export function SkillsToLearnStep() {
               {selectedCategory ? (
                 <Select value={selectedSkill} onValueChange={setSelectedSkill}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select skill" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categorySkills.map((skill) => (
-                      <SelectItem key={skill} value={skill}>
-                        {skill}
+                     <SelectValue placeholder="Select skill" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     {categorySkills.map((skill: string) => (
+                       <SelectItem key={skill} value={skill}>
+                         {skill}
                       </SelectItem>
                     ))}
                     <SelectItem value="custom">Custom skill...</SelectItem>
                   </SelectContent>
                 </Select>
               ) : (
-                <Input
-                  id="customSkill"
-                  value={customSkill}
-                  onChange={(e) => setCustomSkill(e.target.value)}
-                  placeholder="Enter skill you want to learn"
-                />
+                 <Input
+                   id="customSkill"
+                   value={customSkill}
+                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomSkill(e.target.value)}
+                   placeholder="Enter skill you want to learn"
+                 />
               )}
             </div>
           </div>
@@ -174,12 +177,12 @@ export function SkillsToLearnStep() {
           {selectedSkill === "custom" && (
             <div className="space-y-2">
               <Label htmlFor="customSkill">Custom Skill Name</Label>
-              <Input
-                id="customSkill"
-                value={customSkill}
-                onChange={(e) => setCustomSkill(e.target.value)}
-                placeholder="Enter the skill you want to learn"
-              />
+               <Input
+                 id="customSkill"
+                 value={customSkill}
+                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomSkill(e.target.value)}
+                 placeholder="Enter the skill you want to learn"
+               />
             </div>
           )}
 
@@ -201,11 +204,11 @@ export function SkillsToLearnStep() {
           <div className="space-y-2">
             <Label htmlFor="learningGoal">Learning Goal</Label>
             <Textarea
-              id="learningGoal"
-              value={learningGoal}
-              onChange={(e) => setLearningGoal(e.target.value)}
-              placeholder="What do you hope to achieve by learning this skill?"
-              className="resize-none"
+               id="learningGoal"
+               value={learningGoal}
+               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setLearningGoal(e.target.value)}
+               placeholder="What do you hope to achieve by learning this skill?"
+               className="resize-none"
               rows={3}
             />
           </div>

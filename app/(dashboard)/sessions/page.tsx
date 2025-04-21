@@ -7,8 +7,8 @@ import { Calendar } from "@/components/ui/calendar"
 import { UpcomingSession } from "@/components/upcoming-session"
 import { SessionHistory } from "@/components/session-history"
 import { CalendarPlus, AlertCircle, Loader2 } from "lucide-react"
-import { getUserIdFromRequest } from "@/lib/auth-utils"
-import { getUserSessions, DbSession } from "@/lib/db"
+// Removed getUserIdFromRequest import as we'll use verifyToken directly
+import { getUserSessions, DbSession, verifyToken } from "@/lib/db" // Import verifyToken
 import { redirect } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -60,26 +60,23 @@ function UpcomingSessionSkeleton() {
   );
 }
 
-// Mock getAuth function to replace the missing import from @/lib/auth
-async function getAuth() {
-  // Get the request object that we can pass to getUserIdFromRequest
+export default async function SessionsPage() {
+  // Directly get user ID from token using verifyToken
   const cookieStore = await cookies();
   const authToken = cookieStore.get('auth-token')?.value;
-  
-  // If we have a token, get the user ID
-  if (authToken) {
-    // In a real implementation, this would verify the token
-    // and return the user ID
-    return { userId: getUserIdFromRequest(authToken) }; // Mock ID for now
-  }
-  
-  return { userId: null };
-}
+  let userId: string | null = null;
 
-export default async function SessionsPage() {
-  const { userId } = await getAuth()
+  if (authToken) {
+    const verificationResult = verifyToken(authToken);
+    // Define expected shape of decoded user payload
+    type DecodedUser = { id: string; [key: string]: any };
+    // Safely access user ID from decoded token with type assertion
+    const decodedUser = verificationResult.data?.session?.user as DecodedUser | undefined;
+    userId = decodedUser?.id || null;
+  }
+
   if (!userId) {
-    redirect("/login")
+    redirect("/login"); // Redirect if no token or token is invalid
   }
 
   let upcomingSessions: PopulatedSession[] = []
@@ -111,12 +108,13 @@ export default async function SessionsPage() {
         scheduledTime: session.start_time,
         status: session.status,
         notes: session.notes,
-        tokenAmount: 10, // Placeholder
+        tokenAmount: 10, // Revert to Placeholder - DbSession type doesn't have token_amount
+        // Revert to Placeholders - DbSession type doesn't have populated relations
         teacher: { id: session.teacher_id, firstName: "Teacher", lastName: "Name", imageUrl: null },
         learner: { id: session.learner_id, firstName: "Learner", lastName: "Name", imageUrl: null },
         skill: { id: session.skill_id, name: "Skill Name" }
       }));
-      
+
     pastSessions = allSessions
       .filter(session => new Date(session.start_time) < now)
       .map(session => ({
@@ -127,12 +125,13 @@ export default async function SessionsPage() {
         scheduledTime: session.start_time,
         status: session.status,
         notes: session.notes,
-        tokenAmount: 10, // Placeholder
+        tokenAmount: 10, // Revert to Placeholder - DbSession type doesn't have token_amount
+        // Revert to Placeholders - DbSession type doesn't have populated relations
         teacher: { id: session.teacher_id, firstName: "Teacher", lastName: "Name", imageUrl: null },
         learner: { id: session.learner_id, firstName: "Learner", lastName: "Name", imageUrl: null },
         skill: { id: session.skill_id, name: "Skill Name" }
       }));
-      
+
     isLoading = false
   } catch (err) {
     console.error("Failed to fetch sessions:", err)

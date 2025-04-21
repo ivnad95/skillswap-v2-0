@@ -64,20 +64,17 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
     if (prevIndex >= 0) {
       setCurrentStep(steps[prevIndex])
     }
-  }
-
-  const updateOnboardingData = (data: Record<string, any>) => {
-    setOnboardingData((prev) => ({ ...prev, ...data }))
-  }
-
+   }
+ 
+   const updateOnboardingData = (data: Record<string, any>) => {
+     setOnboardingData((prev: Record<string, any>) => ({ ...prev, ...data }))
+   }
+ 
   const completeOnboarding = async () => {
     try {
-      setIsCompleted(true)
-      
-      // Log the data we have before sending
-      console.log("Original onboarding data:", onboardingData)
-
-      // Create a properly structured object for the database
+       setIsCompleted(true)
+       
+       // Create a properly structured object for the database
       const dataToSend = {
         // Profile information
         bio: onboardingData.bio || '',
@@ -99,12 +96,10 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
         
         // Availability info
         availability: onboardingData.availability || {},
-        sessionPreferences: onboardingData.sessionPreferences || {}
-      }
-
-      console.log("Sending onboarding data:", dataToSend)
-
-      const response = await fetch('/api/onboarding/complete', {
+         sessionPreferences: onboardingData.sessionPreferences || {}
+       }
+ 
+       const response = await fetch('/api/onboarding/complete', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,12 +107,12 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify(dataToSend),
       })
 
-      const result = await response.json()
-
-      if (!response.ok) {
-        console.error('Error completing onboarding:', result.error)
-        return false
-      }
+       const result = await response.json()
+ 
+       if (!response.ok) {
+         // TODO: Add user-facing error handling (e.g., toast notification)
+         return false
+       }
 
       // Set the onboarding-completed cookie
       document.cookie = 'onboarding-completed=true; path=/; max-age=31536000' // 1 year
@@ -125,11 +120,11 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
       // Redirect to dashboard
       window.location.href = '/dashboard'
 
-      return true
-    } catch (error) {
-      console.error('Error completing onboarding:', error)
-      return false
-    }
+       return true
+     } catch (error) {
+       // TODO: Add user-facing error handling (e.g., toast notification)
+       return false
+     }
   }
 
   return (
