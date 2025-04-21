@@ -66,6 +66,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ sessions: result.data });
   } catch (error) {
     console.error("Error getting sessions:", error);
+    logSecurityEvent(
+      null,
+      'GET',
+      'sessions',
+      null,
+      false,
+      `Unexpected error: ${error.message}`
+    );
     return NextResponse.json(
       { error: { message: "An unexpected error occurred" } },
       { status: 500 }
@@ -159,6 +167,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ session: result.data }, { status: 201 });
   } catch (error) {
     console.error("Error creating session:", error);
+    logSecurityEvent(
+      null,
+      'POST',
+      'session',
+      null,
+      false,
+      `Unexpected error: ${error.message}`
+    );
     return NextResponse.json(
       { error: { message: "An unexpected error occurred" } },
       { status: 500 }

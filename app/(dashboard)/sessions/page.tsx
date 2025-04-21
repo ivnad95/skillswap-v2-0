@@ -70,7 +70,7 @@ async function getAuth() {
   if (authToken) {
     // In a real implementation, this would verify the token
     // and return the user ID
-    return { userId: "user-123" }; // Mock ID for now
+    return { userId: getUserIdFromRequest(authToken) }; // Mock ID for now
   }
   
   return { userId: null };

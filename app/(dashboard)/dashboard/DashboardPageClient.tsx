@@ -35,7 +35,7 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !user) {
-      window.location.href = "/login?redirect=/dashboard"
+      router.push("/login?redirect=/dashboard")
     }
   }, [user, isLoading])
 

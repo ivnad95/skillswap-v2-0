@@ -74,20 +74,5 @@ export default function DashboardPage() {
     return null
   }
 
-  // If userData is not set, create an empty one
-  if (!userData) {
-    return <DashboardPageClient userData={{
-      profile: {
-        bio: "",
-        location: "",
-        social_links: {},
-        learning_preferences: {}
-      },
-      skills: [],
-      sessions: [],
-      user,
-    }} />
-  }
-
   return <DashboardPageClient userData={userData} />
 }

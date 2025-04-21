@@ -75,6 +75,14 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error("Error getting profile:", error);
+    logSecurityEvent(
+      null,
+      'GET',
+      'profile',
+      null,
+      false,
+      `Unexpected error: ${error.message}`
+    );
     return NextResponse.json(
       { error: { message: "An unexpected error occurred" } },
       { status: 500 }
@@ -149,6 +157,14 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ success: true, message: "Profile updated successfully" });
   } catch (error) {
     console.error("Error updating profile:", error);
+    logSecurityEvent(
+      null,
+      'PUT',
+      'profile',
+      null,
+      false,
+      `Unexpected error: ${error.message}`
+    );
     return NextResponse.json(
       { error: { message: "An unexpected error occurred" } },
       { status: 500 }
