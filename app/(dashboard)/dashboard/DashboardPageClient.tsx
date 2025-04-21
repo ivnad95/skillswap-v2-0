@@ -271,9 +271,11 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
           </Card>
         </div>
       </div>
-      
-      {/* AI Assistant component (fixed position) */}
-      <AIAssistant />
+
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold">Component Diagram</h2>
+        <img src="/docs/component-diagram.png" alt="Component Diagram" className="mt-4" />
+      </div>
     </div>
   )
 }

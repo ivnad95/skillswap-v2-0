@@ -39,9 +39,34 @@ Base your recommendations on:
 - Rating and reviews (10%)
 `
 
-export async function POST(req: NextRequest) {
+interface UserProfile {
+  skillsToTeach: { skill: string; level: string }[]
+  skillsToLearn: string[]
+  availability: string[]
+  learningStylePreferences: string[]
+  previousSessions: { sessionId: string; rating: number }[]
+}
+
+interface LearningGoals {
+  skillsToLearn: string[]
+  preferredTeachers: string[]
+}
+
+interface Match {
+  skill: string
+  matchScore: number
+  reasoning: string
+  suggestedTeachers: string[]
+}
+
+interface MatchResponse {
+  matches: Match[]
+  recommendedActions: string[]
+}
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const { userProfile, learningGoals } = await req.json()
+    const { userProfile, learningGoals }: { userProfile: UserProfile; learningGoals: LearningGoals } = await req.json()
 
     if (!userProfile || !learningGoals) {
       return NextResponse.json({ error: "Invalid request format" }, { status: 400 })
@@ -66,7 +91,7 @@ export async function POST(req: NextRequest) {
     })
 
     // Parse the response as JSON
-    let matches
+    let matches: MatchResponse
     try {
       matches = JSON.parse(text)
     } catch (e) {
