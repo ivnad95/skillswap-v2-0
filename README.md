@@ -195,3 +195,9 @@ Our mission is to create a world where anyone can learn anything from anyone els
 ---
 
 © 2025 SkillSwap. All rights reserved.
+
+## Platform Architecture Flowchart
+
+Below is a detailed flowchart of the platform's architecture, showing how the different components interact:
+
+![Platform Architecture Flowchart](./docs/architecture-flowchart.png)
