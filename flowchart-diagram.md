@@ -135,7 +135,7 @@ flowchart TD
     Components --> FeatureComponents[Feature Components]
     Components --> LayoutComponents[Layout Components]
     
-    %% UI Components (Updated with actual components from workspace)
+    %% UI Components
     UIComponents --> Button[Button components/ui/button.tsx]
     UIComponents --> Card[Card components/ui/card.tsx]
     UIComponents --> Input[Input components/ui/input.tsx]
@@ -163,15 +163,13 @@ flowchart TD
     UIComponents --> Chart[Chart components/ui/chart.tsx]
     UIComponents --> ThemeToggle[Theme Toggle components/theme-toggle.tsx]
     
-    %% Feature Components (Organized by functionality)
-    %% AI & Recommendation Components
+    %% Feature Components
     FeatureComponents --> AIGroup[AI Components]
     AIGroup --> AIAssistant[AI Assistant components/ai-assistant.tsx]
     AIGroup --> AISkillMatchingShowcase[AI Skill Matching Showcase components/ai-skill-matching-showcase.tsx]
     AIGroup --> LearningRecommendations[Learning Recommendations components/learning-recommendations.tsx]
     AIGroup --> RecommendedMatches[Recommended Matches components/recommended-matches.tsx]
     
-    %% Profile & User Components
     FeatureComponents --> ProfileGroup[Profile Components]
     ProfileGroup --> ProfileEditModal[Profile Edit Modal components/profile-edit-modal.tsx]
     ProfileGroup --> ProfileHeader[Profile Header components/profile-header.tsx]
@@ -180,29 +178,25 @@ flowchart TD
     ProfileGroup --> AccountSettings[Account Settings components/account-settings.tsx]
     ProfileGroup --> NotificationSettings[Notification Settings components/notification-settings.tsx]
     
-    %% Session & Calendar Components
     FeatureComponents --> SessionGroup[Session Components]
     SessionGroup --> AvailabilityCalendar[Availability Calendar components/availability-calendar.tsx]
     SessionGroup --> SessionHistory[Session History components/session-history.tsx]
     SessionGroup --> UpcomingSession[Upcoming Session components/upcoming-session.tsx]
     
-    %% Skill Components
     FeatureComponents --> SkillGroup[Skill Components]
     SkillGroup --> SkillCard[Skill Card components/skill-card.tsx]
     SkillGroup --> SkillShowcase[Skill Showcase components/skill-showcase.tsx]
     SkillGroup --> ExploreSkillCard[Explore Skill Card components/explore-skill-card.tsx]
     SkillGroup --> ExploreTeacherCard[Explore Teacher Card components/explore-teacher-card.tsx]
     
-    %% Messaging & Communication Components
     FeatureComponents --> CommunicationGroup[Communication Components]
     CommunicationGroup --> MessagingInterface[Messaging Interface components/messaging-interface.tsx]
     
-    %% Payment & Billing Components
     FeatureComponents --> PaymentGroup[Payment Components]
     PaymentGroup --> TokenBalance[Token Balance components/token-balance.tsx]
     PaymentGroup --> PaymentSettings[Payment Settings components/payment-settings.tsx]
     
-    %% Layout Components (Organized hierarchically)
+    %% Layout Components
     LayoutComponents --> MainNav[Main Nav components/main-nav.tsx]
     LayoutComponents --> MobileNav[Mobile Nav components/mobile-nav.tsx]
     LayoutComponents --> SidebarNav[Sidebar Nav components/sidebar-nav.tsx]
@@ -216,7 +210,6 @@ flowchart TD
     LayoutComponents --> DashboardShell[Dashboard Shell components/dashboard-shell.tsx]
     DashboardShell --> DashboardHeader
     
-    %% Marketing Components
     LayoutComponents --> MarketingComponents[Marketing Components]
     MarketingComponents --> CTASection[CTA Section components/cta-section.tsx]
     MarketingComponents --> FeatureSection[Feature Section components/feature-section.tsx]
@@ -225,7 +218,7 @@ flowchart TD
     MarketingComponents --> ReviewsSection[Reviews Section components/reviews-section.tsx]
     MarketingComponents --> TestimonialSection[Testimonial Section components/testimonial-section.tsx]
     
-    %% Component Relationships (Based on actual imports)
+    %% Component Relationships
     UpcomingSession --> Avatar
     UpcomingSession --> Button
     
