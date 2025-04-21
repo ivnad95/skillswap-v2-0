@@ -1,135 +1,256 @@
 ```mermaid
 flowchart TD
-    %% Main Application Flow
-    User[User] --> Auth{Authentication}
-    Auth -->|Not Authenticated| Login[Login/Signup]
-    Auth -->|Authenticated| OnboardingCheck{Onboarding Completed?}
-    OnboardingCheck -->|No| Onboarding[Onboarding Process]
-    OnboardingCheck -->|Yes| Dashboard[Dashboard]
-    
-    %% Authentication Flow
-    Login --> SignIn[Sign In]
-    Login --> SignUp[Sign Up]
-    SignIn -->|Success| JWT[JWT Token Generation]
-    SignUp -->|Success| JWT
-    JWT --> AuthCookie[Set Auth Cookie]
-    AuthCookie --> OnboardingCheck
-    
+    %% Main Application Structure
+    Root[Root Layout] --> AuthProvider[Auth Provider]
+    AuthProvider --> ThemeProvider[Theme Provider]
+    ThemeProvider --> AppRoutes[App Routes]
+
+    %% App Routes Structure
+    AppRoutes --> PublicRoutes[Public Routes]
+    AppRoutes --> ProtectedRoutes[Protected Routes]
+    AppRoutes --> APIRoutes[API Routes]
+
+    %% Public Routes
+    PublicRoutes --> HomePage[Home Page]
+    PublicRoutes --> AboutPage[About Page]
+    PublicRoutes --> ContactPage[Contact Page]
+    PublicRoutes --> FeaturesPage[Features Page]
+    PublicRoutes --> PricingPage[Pricing Page]
+    PublicRoutes --> LoginPage[Login Page]
+    PublicRoutes --> SignupPage[Signup Page]
+    PublicRoutes --> VerifyEmailPage[Verify Email Page]
+
+    %% Protected Routes with Dashboard Layout
+    ProtectedRoutes --> DashboardLayout[Dashboard Layout]
+    DashboardLayout --> DashboardPage[Dashboard Page]
+    DashboardLayout --> ExplorePage[Explore Page]
+    DashboardLayout --> SessionsPage[Sessions Page]
+    DashboardLayout --> MessagesPage[Messages Page]
+    DashboardLayout --> CommunityPage[Community Page]
+    DashboardLayout --> ProfilePage[Profile Page]
+    DashboardLayout --> SettingsPage[Settings Page]
+    DashboardLayout --> BillingPage[Billing Page]
+    DashboardLayout --> SkillsPage[Skills Page]
+
+    %% Dashboard Page Implementation
+    DashboardPage --> DashboardPageClient[Dashboard Page Client]
+    DashboardPageClient --> TokenBalance
+    DashboardPageClient --> UpcomingSession
+    DashboardPageClient --> SkillCard
+    DashboardPageClient --> RecommendedMatches
+
+    %% Sessions Page Implementation
+    SessionsPage --> UpcomingSession
+    SessionsPage --> SessionHistory
+    SessionsPage --> Calendar
+
+    %% Skills Page Implementation
+    SkillsPage --> SkillShowcase
+    SkillsPage --> Badge
+
+    %% Community Page Implementation
+    CommunityPage --> Badge
+    CommunityPage --> Avatar
+    CommunityPage --> Card
+
     %% Onboarding Flow
-    Onboarding --> Welcome[Welcome Step]
-    Welcome --> PersonalInfo[Personal Info Step]
-    PersonalInfo --> TeachSkills[Skills to Teach Step]
-    TeachSkills --> LearnSkills[Skills to Learn Step]
-    LearnSkills --> Availability[Availability Step]
-    Availability --> ProfilePhoto[Profile Photo Step]
-    ProfilePhoto --> Complete[Complete Step]
-    Complete --> OnboardingAPI[Onboarding API]
-    OnboardingAPI --> Dashboard
-    
-    %% Dashboard and Main Features
-    Dashboard --> Explore[Explore Skills/Teachers]
-    Dashboard --> Profile[User Profile]
-    Dashboard --> Sessions[Session Management]
-    Dashboard --> Messages[Messaging]
-    Dashboard --> Community[Community Forums]
-    Dashboard --> Settings[User Settings]
-    Dashboard --> Skills[Skill Management]
-    
-    %% AI Integration
-    Dashboard --> AIAssistant[AI Assistant]
-    Dashboard --> AIMatching[AI Skill Matching]
-    Dashboard --> AIRecommendations[AI Learning Recommendations]
-    
-    %% Database Interactions
-    subgraph Database
-        Users[(Users Table)]
-        Profiles[(Profiles Table)]
-        Skills[(Skills Table)]
-        Sessions[(Sessions Table)]
-        Transactions[(Transactions Table)]
-        Ratings[(Ratings Table)]
-        Communities[(Communities Table)]
-        CommunityPosts[(Community Posts Table)]
-        EmailVerification[(Email Verification Tokens)]
-        PasswordReset[(Password Reset Tokens)]
-    end
-    
-    %% API Routes
-    subgraph API
-        AuthAPI[Authentication API]
-        OnboardingAPI
-        SkillsAPI[Skills API]
-        SessionsAPI[Sessions API]
-        ProfileAPI[Profile API]
-        DBAPI[Database API]
-        AIAPI[AI Integration API]
-    end
-    
-    %% API to Database Connections
-    AuthAPI <--> Users
-    AuthAPI <--> EmailVerification
-    AuthAPI <--> PasswordReset
-    OnboardingAPI <--> Profiles
-    SkillsAPI <--> Skills
-    SessionsAPI <--> Sessions
-    SessionsAPI <--> Transactions
-    ProfileAPI <--> Profiles
-    ProfileAPI <--> Users
-    DBAPI <--> Database
-    
-    %% User Interactions with API
-    SignIn --> AuthAPI
-    SignUp --> AuthAPI
-    Complete --> OnboardingAPI
-    Skills --> SkillsAPI
-    Sessions --> SessionsAPI
-    Profile --> ProfileAPI
-    
-    %% AI Integration
-    AIAssistant --> AIAPI
-    AIMatching --> AIAPI
-    AIRecommendations --> AIAPI
-    AIAPI -->|Groq LLM| AIModels[AI Models]
-    
-    %% Token System
-    Sessions -->|Teaching| EarnTokens[Earn Tokens]
-    Sessions -->|Learning| SpendTokens[Spend Tokens]
-    EarnTokens --> Transactions
-    SpendTokens --> Transactions
-    
+    ProtectedRoutes --> OnboardingLayout[Onboarding Layout]
+    OnboardingLayout --> OnboardingPage[Onboarding Page]
+    OnboardingPage --> OnboardingComponent[Onboarding Component]
+    OnboardingComponent --> OnboardingSteps[Onboarding Steps]
+
+    %% Onboarding Steps
+    OnboardingSteps --> WelcomeStep[Welcome Step]
+    OnboardingSteps --> PersonalInfoStep[Personal Info Step]
+    OnboardingSteps --> SkillsToTeachStep[Skills to Teach Step]
+    OnboardingSteps --> SkillsToLearnStep[Skills to Learn Step]
+    OnboardingSteps --> AvailabilityStep[Availability Step]
+    OnboardingSteps --> ProfilePhotoStep[Profile Photo Step]
+    OnboardingSteps --> CompleteStep[Complete Step]
+
+    %% API Routes Structure
+    APIRoutes --> AuthAPI[Auth API]
+    APIRoutes --> DbAPI[Database API]
+    APIRoutes --> ProfileAPI[Profile API]
+    APIRoutes --> SkillsAPI[Skills API]
+    APIRoutes --> SessionsAPI[Sessions API]
+    APIRoutes --> OnboardingAPI[Onboarding API]
+    APIRoutes --> AIAPI[AI API]
+
+    %% Auth API Routes
+    AuthAPI --> SigninRoute[Signin Route]
+    AuthAPI --> SignupRoute[Signup Route]
+    AuthAPI --> VerifyRoute[Verify Route]
+    AuthAPI --> VerifyEmailRoute[Verify Email Route]
+    AuthAPI --> ResetPasswordRoute[Reset Password Route]
+    AuthAPI --> UpdatePasswordRoute[Update Password Route]
+    AuthAPI --> UserRoute[User Route]
+
+    %% Database API Routes
+    DbAPI --> QueryRoute[Query Route]
+    DbAPI --> InsertRoute[Insert Route]
+    DbAPI --> UpdateRoute[Update Route]
+    DbAPI --> DeleteRoute[Delete Route]
+
+    %% Profile API Routes
+    ProfileAPI --> ProfileRoute[Profile Route]
+
+    %% Skills API Routes
+    SkillsAPI --> SkillsRoute[Skills Route]
+    SkillsAPI --> SkillByIdRoute[Skill by ID Route]
+
+    %% Sessions API Routes
+    SessionsAPI --> SessionsRoute[Sessions Route]
+    SessionsAPI --> SessionByIdRoute[Session by ID Route]
+
+    %% Onboarding API Routes
+    OnboardingAPI --> OnboardingCompleteRoute[Onboarding Complete Route]
+    OnboardingAPI --> OnboardingStatusRoute[Onboarding Status Route]
+
+    %% AI API Routes
+    AIAPI --> AIAssistantRoute[AI Assistant Route]
+    AIAPI --> AISkillMatchingRoute[AI Skill Matching Route]
+    AIAPI --> AILearningRecommendationsRoute[AI Learning Recommendations Route]
+
     %% Middleware
-    Middleware[Middleware] --> Auth
-    Middleware --> RouteProtection[Route Protection]
-    RouteProtection --> OnboardingCheck
-    
-    %% Components Structure
-    subgraph Components
-        UIComponents[UI Components]
-        PageComponents[Page Components]
-        FeatureComponents[Feature Components]
-    end
-    
+    Middleware[Middleware] --> AppRoutes
+
     %% Context Providers
-    subgraph Contexts
-        AuthContext[Auth Context]
-        OnboardingContext[Onboarding Context]
-    end
-    
+    AuthContext[Auth Context] --> AuthProvider
+    OnboardingContext[Onboarding Context] --> OnboardingComponent
+
+    %% Library Files
+    DbLibrary[Database Library] --> DbAPI
+    DbClientLibrary[Database Client Library] --> DbAPI
+    AuthUtilsLibrary[Auth Utils Library] --> AuthAPI
+    AISkillMatchingLibrary[AI Skill Matching Library] --> AIAPI
+    UtilsLibrary[Utils Library] --> Components
+
     %% Hooks
-    subgraph Hooks
-        UseMobile[Use Mobile]
-        UseToast[Use Toast]
-    end
-    
-    %% Library Utilities
-    subgraph Libraries
-        DBClient[DB Client]
-        AuthUtils[Auth Utilities]
-        AISkillMatching[AI Skill Matching]
-        Utils[Utilities]
-    end
-    
-    %% Detailed Database Schema
+    UseMobileHook[Use Mobile Hook] --> Components
+    UseToastHook[Use Toast Hook] --> Components
+
+    %% Main Components
+    Components --> UIComponents[UI Components]
+    Components --> FeatureComponents[Feature Components]
+    Components --> LayoutComponents[Layout Components]
+
+    %% UI Components
+    UIComponents --> Button[Button]
+    UIComponents --> Card[Card]
+    UIComponents --> Input[Input]
+    UIComponents --> Avatar[Avatar]
+    UIComponents --> Dialog[Dialog]
+    UIComponents --> DropdownMenu[Dropdown Menu]
+    UIComponents --> Form[Form]
+    UIComponents --> Select[Select]
+    UIComponents --> Tabs[Tabs]
+    UIComponents --> Toast[Toast]
+    UIComponents --> Toaster[Toaster]
+    UIComponents --> Badge[Badge]
+    UIComponents --> Calendar[Calendar]
+    UIComponents --> Checkbox[Checkbox]
+    UIComponents --> Command[Command]
+    UIComponents --> Label[Label]
+    UIComponents --> Menubar[Menubar]
+    UIComponents --> Popover[Popover]
+    UIComponents --> Sheet[Sheet]
+    UIComponents --> Textarea[Textarea]
+    UIComponents --> Progress[Progress]
+    UIComponents --> Alert[Alert]
+    UIComponents --> Skeleton[Skeleton]
+    UIComponents --> Logo[Logo]
+    UIComponents --> Chart[Chart]
+    UIComponents --> ThemeToggle[Theme Toggle]
+
+    %% Feature Components
+    FeatureComponents --> AIGroup[AI Components]
+    AIGroup --> AIAssistant[AI Assistant]
+    AIGroup --> AISkillMatchingShowcase[AI Skill Matching Showcase]
+    AIGroup --> LearningRecommendations[Learning Recommendations]
+    AIGroup --> RecommendedMatches[Recommended Matches]
+
+    FeatureComponents --> ProfileGroup[Profile Components]
+    ProfileGroup --> ProfileEditModal[Profile Edit Modal]
+    ProfileGroup --> ProfileHeader[Profile Header]
+    ProfileGroup --> ProfileStats[Profile Stats]
+    ProfileGroup --> UserMenu[User Menu]
+    ProfileGroup --> AccountSettings[Account Settings]
+    ProfileGroup --> NotificationSettings[Notification Settings]
+
+    FeatureComponents --> SessionGroup[Session Components]
+    SessionGroup --> AvailabilityCalendar[Availability Calendar]
+    SessionGroup --> SessionHistory[Session History]
+    SessionGroup --> UpcomingSession[Upcoming Session]
+
+    FeatureComponents --> SkillGroup[Skill Components]
+    SkillGroup --> SkillCard[Skill Card]
+    SkillGroup --> SkillShowcase[Skill Showcase]
+    SkillGroup --> ExploreSkillCard[Explore Skill Card]
+    SkillGroup --> ExploreTeacherCard[Explore Teacher Card]
+
+    FeatureComponents --> CommunicationGroup[Communication Components]
+    CommunicationGroup --> MessagingInterface[Messaging Interface]
+
+    FeatureComponents --> PaymentGroup[Payment Components]
+    PaymentGroup --> TokenBalance[Token Balance]
+    PaymentGroup --> PaymentSettings[Payment Settings]
+
+    %% Layout Components
+    LayoutComponents --> MainNav[Main Nav]
+    LayoutComponents --> MobileNav[Mobile Nav]
+    LayoutComponents --> SidebarNav[Sidebar Nav]
+    LayoutComponents --> SiteFooter[Site Footer]
+    LayoutComponents --> DashboardHeader[Dashboard Header]
+    DashboardHeader --> ThemeToggle
+    DashboardHeader --> Sheet
+    DashboardHeader --> SidebarNav
+    DashboardHeader --> Logo
+
+    LayoutComponents --> DashboardShell[Dashboard Shell]
+    DashboardShell --> DashboardHeader
+
+    LayoutComponents --> MarketingComponents[Marketing Components]
+    MarketingComponents --> CTASection[CTA Section]
+    MarketingComponents --> FeatureSection[Feature Section]
+    MarketingComponents --> HeroSection[Hero Section]
+    MarketingComponents --> PricingSection[Pricing Section]
+    MarketingComponents --> ReviewsSection[Reviews Section]
+    MarketingComponents --> TestimonialSection[Testimonial Section]
+
+    %% Component Relationships
+    UpcomingSession --> Avatar
+    UpcomingSession --> Button
+
+    SessionHistory --> Card
+    SessionHistory --> Avatar
+    SessionHistory --> Badge
+
+    SkillShowcase --> Card
+    SkillShowcase --> Progress
+    SkillShowcase --> Badge
+    SkillShowcase --> Tabs
+
+    DashboardShell --> Card
+
+    ExploreSkillCard --> Card
+    ExploreSkillCard --> Badge
+
+    ExploreTeacherCard --> Badge
+
+    %% Database Schema
+    Database[(Database)] --> Users[(Users Table)]
+    Database --> Profiles[(Profiles Table)]
+    Database --> Skills[(Skills Table)]
+    Database --> Sessions[(Sessions Table)]
+    Database --> Transactions[(Transactions Table)]
+    Database --> Ratings[(Ratings Table)]
+    Database --> Communities[(Communities Table)]
+    Database --> CommunityPosts[(Community Posts Table)]
+    Database --> EmailVerificationTokens[(Email Verification Tokens Table)]
+    Database --> PasswordResetTokens[(Password Reset Tokens Table)]
+
+    %% Database Relationships
     Users -->|1:1| Profiles
     Users -->|1:N| Skills
     Users -->|1:N| Sessions
@@ -140,26 +261,45 @@ flowchart TD
     Sessions -->|1:N| Ratings
     Sessions -->|1:N| Transactions
     Communities -->|1:N| CommunityPosts
-    
-    %% Session Flow
-    Sessions -->|Scheduled| PendingSessions[Pending Sessions]
-    Sessions -->|Completed| CompletedSessions[Completed Sessions]
-    CompletedSessions --> Ratings
-    
-    %% Skill Matching Process
-    AIMatching -->|Analysis| MatchResults[Match Results]
-    Skills --> AIMatching
-    Profiles --> AIMatching
-    
-    %% Learning Recommendations
-    AIRecommendations -->|Analysis| LearningPath[Learning Path]
-    Skills --> AIRecommendations
-    Profiles --> AIRecommendations
-    
-    %% Messaging System
-    Messages --> Conversations[Conversations]
-    Conversations --> MessageHistory[Message History]
-    
+    Users -->|1:N| EmailVerificationTokens
+    Users -->|1:N| PasswordResetTokens
+
+    %% API to Database Connections
+    DbAPI <--> Database
+    AuthAPI <--> Users
+    AuthAPI <--> EmailVerificationTokens
+    AuthAPI <--> PasswordResetTokens
+    ProfileAPI <--> Profiles
+    SkillsAPI <--> Skills
+    SessionsAPI <--> Sessions
+    SessionsAPI <--> Transactions
+
+    %% AI Integration
+    AIAPI -->|Groq LLM| AIModels[AI Models]
+    AIAssistant --> AIAssistantRoute
+    AISkillMatchingShowcase --> AISkillMatchingRoute
+    LearningRecommendations --> AILearningRecommendationsRoute
+
+    %% Authentication Flow
+    LoginPage --> SigninRoute
+    SignupPage --> SignupRoute
+    SigninRoute --> JWT[JWT Token Generation]
+    SignupRoute --> JWT
+    JWT --> AuthCookie[Set Auth Cookie]
+    AuthCookie --> Middleware
+    Middleware -->|Verify Auth| ProtectedRoutes
+
+    %% Onboarding Flow
+    CompleteStep --> OnboardingCompleteRoute
+    OnboardingCompleteRoute --> Profiles
+
+    %% Token System
+    SessionsAPI -->|Teaching| EarnTokens[Earn Tokens]
+    SessionsAPI -->|Learning| SpendTokens[Spend Tokens]
+    EarnTokens --> Transactions
+    SpendTokens --> Transactions
+    Transactions --> TokenBalance
+
     %% Style Definitions
     classDef primary fill:#4f46e5,stroke:#4338ca,color:white;
     classDef secondary fill:#8b5cf6,stroke:#7c3aed,color:white;
@@ -167,12 +307,42 @@ flowchart TD
     classDef danger fill:#ef4444,stroke:#dc2626,color:white;
     classDef warning fill:#f59e0b,stroke:#d97706,color:white;
     classDef info fill:#3b82f6,stroke:#2563eb,color:white;
-    
+    classDef database fill:#6b7280,stroke:#4b5563,color:white;
+    classDef component fill:#ec4899,stroke:#db2777,color:white;
+    classDef api fill:#14b8a6,stroke:#0d9488,color:white;
+    classDef layout fill:#f97316,stroke:#ea580c,color:white;
+    classDef uicomponent fill:#ec4899,stroke:#db2777,color:white;
+    classDef featurecomponent fill:#8b5cf6,stroke:#7c3aed,color:white;
+    classDef layoutcomponent fill:#f97316,stroke:#ea580c,color:white;
+
     %% Apply Styles
-    class Auth,OnboardingCheck,RouteProtection primary;
-    class Dashboard,Profile,Sessions,Messages,Community,Settings,Skills,Explore secondary;
-    class AIAssistant,AIMatching,AIRecommendations info;
-    class Login,SignIn,SignUp,JWT,AuthCookie warning;
-    class Onboarding,Welcome,PersonalInfo,TeachSkills,LearnSkills,Availability,ProfilePhoto,Complete success;
-    class EarnTokens,SpendTokens,Transactions warning;
+    class Root,AuthProvider,ThemeProvider,AppRoutes,Middleware primary;
+    class PublicRoutes,ProtectedRoutes,APIRoutes,AuthContext,OnboardingContext secondary;
+    class HomePage,AboutPage,ContactPage,FeaturesPage,PricingPage,LoginPage,SignupPage,VerifyEmailPage info;
+    class DashboardLayout,DashboardPage,ExplorePage,SessionsPage,MessagesPage,CommunityPage,ProfilePage,SettingsPage,BillingPage,SkillsPage layout;
+    class OnboardingLayout,OnboardingPage,OnboardingComponent,OnboardingSteps,WelcomeStep,PersonalInfoStep,SkillsToTeachStep,SkillsToLearnStep,AvailabilityStep,ProfilePhotoStep,CompleteStep success;
+    class AuthAPI,DbAPI,ProfileAPI,SkillsAPI,SessionsAPI,OnboardingAPI,AIAPI api;
+    class SigninRoute,SignupRoute,VerifyRoute,VerifyEmailRoute,ResetPasswordRoute,UpdatePasswordRoute,UserRoute,QueryRoute,InsertRoute,UpdateRoute,DeleteRoute,ProfileRoute,SkillsRoute,SkillByIdRoute,SessionsRoute,SessionByIdRoute,OnboardingCompleteRoute,OnboardingStatusRoute,AIAssistantRoute,AISkillMatchingRoute,AILearningRecommendationsRoute api;
+    class Database,Users,Profiles,Skills,Sessions,Transactions,Ratings,Communities,CommunityPosts,EmailVerificationTokens,PasswordResetTokens database;
+    class UIComponents,FeatureComponents,LayoutComponents,Components secondary;
+
+    %% UI Components
+    class Button,Card,Input,Avatar,Dialog,DropdownMenu,Form,Select,Tabs,Toast,Toaster,Badge,Calendar,Checkbox,Command,Label,Menubar,Popover,Sheet,Textarea,Progress,Alert,Skeleton,Logo,Chart,ThemeToggle uicomponent;
+
+    %% Feature Components
+    class AIGroup,ProfileGroup,SessionGroup,SkillGroup,CommunicationGroup,PaymentGroup,MarketingComponents featurecomponent;
+    class AIAssistant,AISkillMatchingShowcase,LearningRecommendations,RecommendedMatches featurecomponent;
+    class ProfileEditModal,ProfileHeader,ProfileStats,UserMenu,AccountSettings,NotificationSettings featurecomponent;
+    class AvailabilityCalendar,SessionHistory,UpcomingSession featurecomponent;
+    class SkillCard,SkillShowcase,ExploreSkillCard,ExploreTeacherCard featurecomponent;
+    class MessagingInterface featurecomponent;
+    class TokenBalance,PaymentSettings featurecomponent;
+
+    %% Layout Components
+    class MainNav,MobileNav,SidebarNav,SiteFooter,DashboardHeader,DashboardShell layoutcomponent;
+    class CTASection,FeatureSection,HeroSection,PricingSection,ReviewsSection,TestimonialSection layoutcomponent;
+
+    %% Auth and Token Flow
+    class JWT,AuthCookie,EarnTokens,SpendTokens warning;
+    class DashboardPageClient,AIModels primary;
 ```
