@@ -47,9 +47,33 @@ Ensure recommendations are:
 - Structured in a logical progression
 `
 
+interface UserProfile {
+  skillLevels: Record<string, number>;
+  learningHistory: string[];
+  goals: string[];
+  availability: string[];
+  learningPreferences: string[];
+}
+
+interface LearningHistory {
+  skillsLearned: string[];
+  progress: Record<string, number>;
+}
+
+interface Goals {
+  careerGoals: string[];
+  personalGoals: string[];
+}
+
+interface RequestBody {
+  userProfile: UserProfile;
+  learningHistory: LearningHistory;
+  goals: Goals;
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { userProfile, learningHistory, goals } = await req.json()
+    const { userProfile, learningHistory, goals }: RequestBody = await req.json()
 
     if (!userProfile || !learningHistory || !goals) {
       return NextResponse.json({ error: "Invalid request format" }, { status: 400 })

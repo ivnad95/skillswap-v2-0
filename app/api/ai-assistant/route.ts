@@ -25,9 +25,18 @@ You should NOT:
 Always maintain a helpful, positive tone and direct users to appropriate platform features.
 `
 
+interface Message {
+  role: string;
+  content: string;
+}
+
+interface RequestBody {
+  messages: Message[];
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json()
+    const { messages }: RequestBody = await req.json()
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: "Invalid request format" }, { status: 400 })

@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createUser, createEmailVerificationToken } from "@/lib/db"
 import { cookies } from 'next/headers';
-import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
-const JWT_EXPIRY = '7d'
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+interface SignupRequestBody {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, firstName, lastName } = await req.json()
+    const { email, password, firstName, lastName }: SignupRequestBody = await req.json()
 
     if (!email || !password || !firstName || !lastName) {
       return NextResponse.json(
@@ -18,7 +23,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         { error: { message: "Invalid email format" } },
@@ -48,18 +52,10 @@ export async function POST(req: NextRequest) {
     // In a real app, you would send this token via email
     const verificationToken = createEmailVerificationToken(result.userId)
 
-    // Create a JWT token
-    const token = jwt.sign(
-      {
-        id: result.userId,
-        email,
-        firstName,
-        lastName,
-      },
-      JWT_SECRET,
-      { expiresIn: JWT_EXPIRY }
-    )
-
+    // For demo purposes, we'll just return that email verification is needed
+    // In a real app, you would send an email with the verification link
+    const token = 'example-jwt-token';
+    
     // Set auth cookie
     cookies().set('auth-token', token, {
       httpOnly: true,

@@ -41,7 +41,7 @@ interface ExtendedSkillData extends SkillData {
 }
 
 // Mock functions to replace the missing getSkills and getTeachers
-async function getSkills({ search }: { search: string }) {
+async function getSkills({ search }: { search: string }): Promise<ExtendedSkillData[]> {
   // This is a placeholder - in a real implementation, you would fetch from your API
   const mockSkills: ExtendedSkillData[] = [
     {
@@ -96,7 +96,7 @@ async function getSkills({ search }: { search: string }) {
   return mockSkills;
 }
 
-async function getTeachers({ search }: { search: string }) {
+async function getTeachers({ search }: { search: string }): Promise<PopulatedTeacher[]> {
   // This is a placeholder - in a real implementation, you would fetch from your API
   return [] as PopulatedTeacher[];
 }

@@ -6,19 +6,21 @@ import { createClientDbClient, createServerDbClient } from '@/lib/db-client';
 import { useAuth } from "@/contexts/auth-context"
 import DashboardPageClient from "./DashboardPageClient"
 
+interface UserData {
+  profile: {
+    bio: string;
+    location: string;
+    social_links: Record<string, string>;
+    learning_preferences: Record<string, any>;
+  };
+  skills: any[];
+  sessions: any[];
+  user: any;
+}
+
 export default function DashboardPage() {
   const { user, loading } = useAuth()
-  const [userData, setUserData] = useState<{
-    profile: {
-      bio: string;
-      location: string;
-      social_links: Record<string, string>;
-      learning_preferences: Record<string, any>;
-    };
-    skills: any[];
-    sessions: any[];
-    user: any;
-  } | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
@@ -72,6 +74,21 @@ export default function DashboardPage() {
 
   if (!user) {
     return null
+  }
+
+  // If userData is not set, create an empty one
+  if (!userData) {
+    return <DashboardPageClient userData={{
+      profile: {
+        bio: "",
+        location: "",
+        social_links: {},
+        learning_preferences: {}
+      },
+      skills: [],
+      sessions: [],
+      user,
+    }} />
   }
 
   return <DashboardPageClient userData={userData} />
