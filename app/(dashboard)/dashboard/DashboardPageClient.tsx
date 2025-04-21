@@ -1,15 +1,18 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { SkillCard } from "@/components/skill-card"
 import { UpcomingSession } from "@/components/upcoming-session"
 import { TokenBalance } from "@/components/token-balance"
 import { RecommendedMatches } from "@/components/recommended-matches"
+import { AIAssistant } from "@/components/ai-assistant"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PlusCircle } from "lucide-react"
+import { PlusCircle, BookOpen, Sparkles, Award } from "lucide-react"
+import { aiModels } from "@/lib/ai-models"
+import { Badge } from "@/components/ui/badge"
 
 type UserData = {
   user?: {
@@ -31,13 +34,44 @@ type UserData = {
 export default function DashboardPageClient({ userData }: { userData: UserData }) {
   const { user, isLoading } = useAuth()
   const router = useRouter()
-
+  const [welcomeMessage, setWelcomeMessage] = useState<string>("")
+  const [aiRecommendations, setAiRecommendations] = useState<string[]>([])
+  const [isAiLoading, setIsAiLoading] = useState<boolean>(true)
+  
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login?redirect=/dashboard")
     }
-  }, [user, isLoading])
+  }, [user, isLoading, router])
+
+  // Load personalized AI content when component mounts
+  useEffect(() => {
+    async function loadAiContent() {
+      if (!userData) return
+      
+      try {
+        // Get personalized welcome message
+        const message = await aiModels.getPersonalizedWelcome(userData)
+        setWelcomeMessage(message)
+        
+        // In a real implementation, we would get AI recommendations from the API
+        // For now, we'll use static recommendations
+        setAiRecommendations([
+          "Based on your JavaScript skills, try exploring React for frontend development",
+          "Connect with Sarah J. who matches 92% with your learning preferences",
+          "Complete your skill profile to improve your matching accuracy",
+          "Schedule your first teaching session to earn SkillTokens"
+        ])
+      } catch (error) {
+        console.error("Error loading AI content:", error)
+      } finally {
+        setIsAiLoading(false)
+      }
+    }
+    
+    loadAiContent()
+  }, [userData])
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -56,11 +90,38 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
     <div className="container mx-auto p-4 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Welcome back, {firstName || "User"}</h1>
+          <h1 className="text-3xl font-bold">
+            {welcomeMessage || `Welcome back, ${firstName}`}
+          </h1>
           <p className="text-muted-foreground">Here's what's happening with your SkillSwap account</p>
         </div>
         <TokenBalance tokens={10} />
       </div>
+
+      {/* AI Recommendations Card */}
+      {!isAiLoading && aiRecommendations.length > 0 && (
+        <Card className="border border-purple-800/30 bg-purple-900/10 shadow-md">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-purple-400" />
+              AI Insights
+            </CardTitle>
+            <CardDescription>Personalized recommendations based on your profile</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {aiRecommendations.map((recommendation, index) => (
+                <li key={index} className="flex items-start gap-2 text-sm">
+                  <div className="mt-0.5 rounded-full bg-purple-800/30 p-1">
+                    <Sparkles className="h-3 w-3 text-purple-400" />
+                  </div>
+                  {recommendation}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
@@ -134,6 +195,56 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
               )}
             </CardContent>
           </Card>
+
+          {/* Learning Progress Card */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-blue-500" />
+                  Learning Progress
+                </CardTitle>
+                <CardDescription>Track your skill development journey</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>JavaScript</span>
+                    <span className="text-muted-foreground">75%</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500" style={{ width: '75%' }}></div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>UX Design</span>
+                    <span className="text-muted-foreground">40%</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500" style={{ width: '40%' }}></div>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <h4 className="text-sm font-medium mb-2">Recent Achievements</h4>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="flex items-center gap-1 border-amber-500/30 text-amber-500">
+                      <Award className="h-3 w-3" />
+                      First Session Completed
+                    </Badge>
+                    <Badge variant="outline" className="flex items-center gap-1 border-blue-500/30 text-blue-500">
+                      <Award className="h-3 w-3" />
+                      5 Skills Added
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-6">
@@ -160,6 +271,9 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
           </Card>
         </div>
       </div>
+      
+      {/* AI Assistant component (fixed position) */}
+      <AIAssistant />
     </div>
   )
 }
