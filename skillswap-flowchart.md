@@ -20,24 +20,21 @@ flowchart TD
     end
 
     %% Middleware & Auth Checks
-    CheckAuthMiddleware -- Accessing Protected Route? --> IsProtectedRoute{Is Protected Route?}; class IsProtectedRoute decision;
-    CheckAuthMiddleware -- Accessing Auth Route? --> IsAuthRoute{Is Auth Route?}; class IsAuthRoute decision;
-    CheckAuthMiddleware -- Neither --> AllowRequest[Allow Request];
+    subgraph Middleware Logic
+        CheckAuthMiddleware -- Request --> IsProtectedRoute{Is Protected Route?}; class IsProtectedRoute decision;
+        IsProtectedRoute -- No --> IsAuthRoute{Is Auth Route?}; class IsAuthRoute decision;
+        IsAuthRoute -- No --> AllowRequest[Allow Request];
+        
+        IsProtectedRoute -- Yes --> CheckToken{Has auth-token cookie?}; class CheckToken decision;
+        CheckToken -- No --> RedirectToLogin[Redirect to /login?redirect=...];
+        CheckToken -- Yes --> CheckOnboardingCookie{Has onboarding-completed cookie?}; class CheckOnboardingCookie decision;
+        CheckOnboardingCookie -- No --> RedirectToOnboarding[Redirect to /onboarding];
+        CheckOnboardingCookie -- Yes --> AllowProtectedRoute[Allow Access to Protected Route];
 
-    IsProtectedRoute -- Yes --> CheckToken{Has auth-token cookie?}; class CheckToken decision;
-    IsProtectedRoute -- No --> AllowRequest;
-
-    IsAuthRoute -- Yes --> CheckTokenAuth{Has auth-token cookie?}; class CheckTokenAuth decision;
-    IsAuthRoute -- No --> AllowAuthRoute[Allow Access to Login/Signup];
-
-    CheckToken -- No --> RedirectToLogin[Redirect to /login?redirect=...];
-    CheckToken -- Yes --> CheckOnboardingCookie{Has onboarding-completed cookie?}; class CheckOnboardingCookie decision;
-
-    CheckTokenAuth -- Yes --> RedirectToDashboard[Redirect to /dashboard];
-    CheckTokenAuth -- No --> AllowAuthRoute;
-
-    CheckOnboardingCookie -- No --> RedirectToOnboarding[Redirect to /onboarding];
-    CheckOnboardingCookie -- Yes --> AllowProtectedRoute[Allow Access to Protected Route];
+        IsAuthRoute -- Yes --> CheckTokenAuth{Has auth-token cookie?}; class CheckTokenAuth decision;
+        CheckTokenAuth -- Yes --> RedirectToDashboard[Redirect to /dashboard];
+        CheckTokenAuth -- No --> AllowAuthRoute[Allow Access to Login/Signup];
+    end
 
     %% Authentication Flow
     subgraph Authentication
@@ -50,33 +47,34 @@ flowchart TD
         LoginPage -- Submit Form --> AuthContextSignIn[AuthContext.signIn]; class AuthContextSignIn context;
         AuthContextSignIn -- API Call --> SignInAPI[api/auth/signin]; class SignInAPI api;
         SignInAPI -- Validate Credentials --> DBCheck1[DB Check]; class DBCheck1 db;
-        SignInAPI -- Generate Token --> AuthToken[auth-token]; class AuthToken cookie;
+        SignInAPI -- On Success --> GenerateToken[Generate Token];
+        GenerateToken --> AuthToken[auth-token]; class AuthToken cookie;
         SignInAPI -- Return User/Token --> AuthContextSignIn;
-        AuthContextSignIn -- Set User State & Cookie --> AuthContextSignIn;
-        AuthContextSignIn -- API Call --> OnboardingStatusAPI[api/onboarding/status]; class OnboardingStatusAPI api;
+        AuthContextSignIn -- On API Success --> SetStateAndCookie[Set User State & auth-token Cookie];
+        SetStateAndCookie --> CheckOnboardingStatus[API Call: Check Onboarding Status];
+        CheckOnboardingStatus --> OnboardingStatusAPI[api/onboarding/status]; class OnboardingStatusAPI api;
         OnboardingStatusAPI -- Check DB --> DBCheck2[DB Check]; class DBCheck2 db;
         OnboardingStatusAPI -- Return Status --> AuthContextSignIn;
-        AuthContextSignIn -- Onboarding Complete? --> OnboardingCompleteCheck{Onboarding Complete?}; class OnboardingCompleteCheck decision;
+        AuthContextSignIn -- Handle Status --> OnboardingCompleteCheck{Onboarding Complete?}; class OnboardingCompleteCheck decision;
         OnboardingCompleteCheck -- Yes --> RedirectToTarget[Redirect to /dashboard or original target];
         OnboardingCompleteCheck -- No --> ForceRedirectOnboarding[window.location = /onboarding];
 
         SignupPage -- Submit Form --> AuthContextSignUp[AuthContext.signUp]; class AuthContextSignUp context;
         AuthContextSignUp -- API Call --> SignUpAPI[api/auth/signup]; class SignUpAPI api;
         SignUpAPI -- Create User --> DBCheck3[DB Check]; class DBCheck3 db;
-        SignUpAPI -- Needs Verification? --> NeedsVerificationCheck{Needs Verification?}; class NeedsVerificationCheck decision;
         SignUpAPI -- Return Result --> AuthContextSignUp;
-        AuthContextSignUp -- Handle Result --> NeedsVerificationCheck;
+        AuthContextSignUp -- Handle Result --> NeedsVerificationCheck{Needs Email Verification?}; class NeedsVerificationCheck decision;
         NeedsVerificationCheck -- Yes --> RedirectToVerifyEmail[Redirect to /verify-email];
         NeedsVerificationCheck -- No --> RedirectToLoginAfterSignup[Redirect to /login];
 
         RedirectToVerifyEmail --> VerifyEmailPage[app/verify-email/page.tsx]; class VerifyEmailPage page;
-        VerifyEmailPage -- Extract Token/Type --> VerifyEmailPage;
-        VerifyEmailPage -- Call DB Client --> VerifyOtp[DBClient.auth.verifyOtp]; class VerifyOtp db;
+        VerifyEmailPage -- Extract Token/Type --> VerifyLogic[Verify Logic];
+        VerifyLogic -- Call DB Client --> VerifyOtp[DBClient.auth.verifyOtp]; class VerifyOtp db;
         VerifyOtp -- Success? --> VerifySuccessCheck{Success?}; class VerifySuccessCheck decision;
         VerifySuccessCheck -- Yes --> VerifyTypeCheck{Type == 'signup'?}; class VerifyTypeCheck decision;
         VerifySuccessCheck -- No --> ShowVerifyError[Show Error];
-        VerifyTypeCheck -- Yes --> RedirectToOnboardingAfterVerify[Redirect to /onboarding];
-        VerifyTypeCheck -- No --> RedirectToLoginAfterVerify[Redirect to /login];
+        VerifyTypeCheck -- Yes --> RedirectToOnboardingAfterVerify[Redirect to /onboarding (after delay)];
+        VerifyTypeCheck -- No --> RedirectToLoginAfterVerify[Redirect to /login (after delay)];
 
         %% SignOut Flow
         UserMenu --> SignOutClick{Click Sign Out}; class SignOutClick decision;
@@ -105,24 +103,24 @@ flowchart TD
         RenderStep -- profile-photo --> ProfilePhotoStep[ProfilePhotoStep]; class ProfilePhotoStep component;
         RenderStep -- complete --> CompleteStep[CompleteStep]; class CompleteStep component;
 
-        WelcomeStep -- Next --> OnboardingContextNext[OnboardingContext.goToNextStep]; class OnboardingContextNext context;
-        PersonalInfoStep -- Next/Prev --> OnboardingContextNext;
+        WelcomeStep -- Click Next --> OnboardingContextNext[OnboardingContext.goToNextStep]; class OnboardingContextNext context;
+        PersonalInfoStep -- Click Next/Prev --> OnboardingContextNext;
         PersonalInfoStep -- Update Data --> OnboardingContextUpdate[OnboardingContext.updateOnboardingData]; class OnboardingContextUpdate context;
-        SkillsToTeachStep -- Next/Prev --> OnboardingContextNext;
+        SkillsToTeachStep -- Click Next/Prev --> OnboardingContextNext;
         SkillsToTeachStep -- Update Data --> OnboardingContextUpdate;
-        SkillsToLearnStep -- Next/Prev --> OnboardingContextNext;
+        SkillsToLearnStep -- Click Next/Prev --> OnboardingContextNext;
         SkillsToLearnStep -- Update Data --> OnboardingContextUpdate;
-        AvailabilityStep -- Next/Prev --> OnboardingContextNext;
+        AvailabilityStep -- Click Next/Prev --> OnboardingContextNext;
         AvailabilityStep -- Update Data --> OnboardingContextUpdate;
-        ProfilePhotoStep -- Next/Prev --> OnboardingContextNext;
+        ProfilePhotoStep -- Click Next/Prev --> OnboardingContextNext;
         ProfilePhotoStep -- Update Data --> OnboardingContextUpdate;
 
         CompleteStep -- useEffect --> OnboardingContextComplete[OnboardingContext.completeOnboarding]; class OnboardingContextComplete context;
         OnboardingContextComplete -- API Call --> CompleteOnboardingAPI[api/onboarding/complete]; class CompleteOnboardingAPI api;
         CompleteOnboardingAPI -- Update DB --> DBCheck4[DB Check]; class DBCheck4 db;
-        CompleteOnboardingAPI -- Return Success --> OnboardingContextComplete;
-        OnboardingContextComplete -- Set Cookie --> OnboardingCookie[onboarding-completed=true]; class OnboardingCookie cookie;
-        OnboardingContextComplete -- Redirect --> RedirectToDashboardComplete[window.location = /dashboard];
+        CompleteOnboardingAPI -- On Success --> OnboardingContextComplete;
+        OnboardingContextComplete -- On API Success --> SetOnboardingCookie[Set onboarding-completed Cookie]; class SetOnboardingCookie cookie;
+        SetOnboardingCookie --> RedirectToDashboardComplete[window.location = /dashboard];
     end
 
     %% Authenticated Dashboard Area
@@ -136,31 +134,31 @@ flowchart TD
         DashboardLayout --> UserMenu[components/user-menu.tsx]; class UserMenu component;
         DashboardLayout --> RenderChildPage[Render Child Page];
 
-        DashboardHeader -- Link --> DashboardPage[app/(dashboard)/dashboard/page.tsx]; class DashboardPage page;
-        DashboardHeader -- Link --> ExplorePage[app/(dashboard)/explore/page.tsx]; class ExplorePage page;
-        DashboardHeader -- Link --> SessionsPage[app/(dashboard)/sessions/page.tsx]; class SessionsPage page;
-        DashboardHeader -- Link --> MessagesPage[app/(dashboard)/messages/page.tsx]; class MessagesPage page;
+        DashboardHeader -- Link Click --> DashboardPage[app/(dashboard)/dashboard/page.tsx]; class DashboardPage page;
+        DashboardHeader -- Link Click --> ExplorePage[app/(dashboard)/explore/page.tsx]; class ExplorePage page;
+        DashboardHeader -- Link Click --> SessionsPage[app/(dashboard)/sessions/page.tsx]; class SessionsPage page;
+        DashboardHeader -- Link Click --> MessagesPage[app/(dashboard)/messages/page.tsx]; class MessagesPage page;
 
-        UserMenu -- Link --> ProfilePage[app/(dashboard)/profile/page.tsx]; class ProfilePage page;
-        UserMenu -- Link --> SettingsPage[app/(dashboard)/settings/page.tsx]; class SettingsPage page;
+        UserMenu -- Link Click --> ProfilePage[app/(dashboard)/profile/page.tsx]; class ProfilePage page;
+        UserMenu -- Link Click --> SettingsPage[app/(dashboard)/settings/page.tsx]; class SettingsPage page;
 
         RenderChildPage --> DashboardPage;
-        DashboardPage --> FetchUserData[Fetch User Data (Mocked)];
+        DashboardPage -- Fetch User Data --> FetchUserData[Fetch User Data (Mocked)];
         DashboardPage --> DashboardPageClient[DashboardPageClient.tsx]; class DashboardPageClient component;
         DashboardPageClient --> TokenBalance[TokenBalance]; class TokenBalance component;
         DashboardPageClient --> UpcomingSessionComp[UpcomingSession]; class UpcomingSessionComp component;
         DashboardPageClient --> SkillCardComp[SkillCard]; class SkillCardComp component;
         DashboardPageClient --> RecommendedMatches[RecommendedMatches]; class RecommendedMatches component;
         DashboardPageClient --> AIAssistant[AIAssistant]; class AIAssistant component;
-        DashboardPageClient -- Link --> ProfilePage;
-        DashboardPageClient -- Link --> SkillsPage[app/(dashboard)/skills/page.tsx]; class SkillsPage page;
-        DashboardPageClient -- Link --> ExplorePage;
+        DashboardPageClient -- Button Click --> ProfilePage;
+        DashboardPageClient -- Button Click --> SkillsPage[app/(dashboard)/skills/page.tsx]; class SkillsPage page;
+        DashboardPageClient -- Button Click --> ExplorePage;
 
         RenderChildPage --> ExplorePage;
         ExplorePage -- Fetch Skills/Teachers --> ExploreDataFetch[getSkills/getTeachers (Mocked)];
         ExplorePage --> ExploreSkillCard[ExploreSkillCard]; class ExploreSkillCard component;
         ExplorePage --> ExploreTeacherCard[ExploreTeacherCard]; class ExploreTeacherCard component;
-        ExplorePage -- Search --> ExplorePage; %% Reloads with query params
+        ExplorePage -- Submit Search --> ExplorePage; %% Reloads with query params
         ExploreSkillCard -- Click --> SkillDetailPage[app/(dashboard)/skills/[id]/page.tsx]; %% Assumed page
         ExploreTeacherCard -- Click --> UserProfilePage[app/(dashboard)/profile/[userId]/page.tsx]; %% Assumed page
 
@@ -169,7 +167,7 @@ flowchart TD
         SessionsPage --> UpcomingSessionComp;
         SessionsPage --> SessionHistoryComp[SessionHistory]; class SessionHistoryComp component;
         SessionsPage --> CalendarComp[Calendar]; class CalendarComp component;
-        SessionsPage -- Schedule Button --> ScheduleModalOrPage[Schedule Modal/Page]; %% Assumed interaction
+        SessionsPage -- Schedule Button Click --> ScheduleModalOrPage[Schedule Modal/Page]; %% Assumed interaction
 
         RenderChildPage --> MessagesPage;
         MessagesPage --> MessagingInterface[MessagingInterface]; class MessagingInterface component;
@@ -182,29 +180,29 @@ flowchart TD
         ProfilePage --> ReviewsSectionComp[ReviewsSection]; class ReviewsSectionComp component;
         ProfilePage --> AvailabilityCalendarComp[AvailabilityCalendar]; class AvailabilityCalendarComp component;
         ProfilePage --> SessionHistoryComp;
-        ProfileHeaderComp -- Edit Button --> ProfileEditModal[ProfileEditModal]; class ProfileEditModal component;
-        ProfileEditModal -- Save --> SaveProfileAPI[api/profile (Update)]; class SaveProfileAPI api;
+        ProfileHeaderComp -- Edit Button Click --> ProfileEditModal[ProfileEditModal]; class ProfileEditModal component;
+        ProfileEditModal -- Save Click --> SaveProfileAPI[api/profile (Update)]; class SaveProfileAPI api;
         SaveProfileAPI -- Update DB --> DBCheck5[DB Check]; class DBCheck5 db;
-        SaveProfileAPI -- Return Success --> ProfileEditModal;
-        ProfileEditModal -- Close/Update State --> ProfilePage;
+        SaveProfileAPI -- On Success --> ProfileEditModal;
+        ProfileEditModal -- On Save/Close --> ProfilePage;
 
         RenderChildPage --> SettingsPage;
         SettingsPage --> AccountSettings[AccountSettings]; class AccountSettings component;
         SettingsPage --> NotificationSettings[NotificationSettings]; class NotificationSettings component;
         SettingsPage --> PaymentSettings[PaymentSettings]; class PaymentSettings component;
-        AccountSettings -- Save --> UpdateAccountAPI[api/auth/user or similar]; %% Assumed API
-        NotificationSettings -- Save --> UpdateNotificationSettingsAPI[api/settings/notifications]; %% Assumed API
-        PaymentSettings -- Save --> UpdatePaymentSettingsAPI[api/billing/payment]; %% Assumed API
+        AccountSettings -- Save Click --> UpdateAccountAPI[api/auth/user or similar]; %% Assumed API
+        NotificationSettings -- Save Click --> UpdateNotificationSettingsAPI[api/settings/notifications]; %% Assumed API
+        PaymentSettings -- Save Click --> UpdatePaymentSettingsAPI[api/billing/payment]; %% Assumed API
 
         RenderChildPage --> SkillsPage;
         SkillsPage --> SkillShowcaseComp;
-        SkillsPage -- Add Skill Button --> AddSkillPage[app/(dashboard)/skills/new/teaching]; %% Assumed page
+        SkillsPage -- Add Skill Button Click --> AddSkillPage[app/(dashboard)/skills/new/teaching]; %% Assumed page
 
         RenderChildPage --> BillingPage[app/(dashboard)/billing/page.tsx]; class BillingPage page;
-        BillingPage -- Buy Tokens --> PaymentGateway[Payment Gateway Interaction]; %% Assumed interaction
-        BillingPage -- Change Plan --> ChangePlanInteraction[Change Plan Interaction]; %% Assumed interaction
+        BillingPage -- Buy Tokens Click --> PaymentGateway[Payment Gateway Interaction]; %% Assumed interaction
+        BillingPage -- Change Plan Click --> ChangePlanInteraction[Change Plan Interaction]; %% Assumed interaction
 
         RenderChildPage --> CommunityPage[app/(dashboard)/community/page.tsx]; class CommunityPage page;
-        CommunityPage -- View Topic/Event/Group --> DetailView[Topic/Event/Group Detail View]; %% Assumed interaction
-        CommunityPage -- Create Topic/Event/Group --> CreateInteraction[Create Topic/Event/Group Interaction]; %% Assumed interaction
+        CommunityPage -- View Topic/Event/Group Click --> DetailView[Topic/Event/Group Detail View]; %% Assumed interaction
+        CommunityPage -- Create Topic/Event/Group Click --> CreateInteraction[Create Topic/Event/Group Interaction]; %% Assumed interaction
     end
