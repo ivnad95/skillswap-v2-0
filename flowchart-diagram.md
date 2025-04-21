@@ -15,7 +15,7 @@ flowchart TD
     AppRoutes --> APIRoutes[API Routes]
 
     %% Public Routes
-    PublicRoutes --> HomePage[Home Page]
+    PublicRoutes Beit--> HomePage[Home Page]
     PublicRoutes --> AboutPage[About Page]
     PublicRoutes --> ContactPage[Contact Page]
     PublicRoutes --> FeaturesPage[Features Page]
@@ -234,3 +234,4 @@ flowchart TD
     class Root,AuthProvider,ThemeProvider,AppRoutes primary;
     class PublicRoutes,ProtectedRoutes,APIRoutes secondary;
     class DashboardLayout,DashboardPage,ExplorePage,SessionsPage,MessagesPage,CommunityPage,ProfilePage,SettingsPage,BillingPage,SkillsPage success;
+    class AuthAPI,DbAPI,ProfileAPI,SkillsAPI,SessionsAPI,OnboardingAPI,AIAPI api;
