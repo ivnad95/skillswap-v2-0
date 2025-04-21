@@ -2,8 +2,8 @@
 %%{ init: { 'flowchart': { 'curve': 'basis', 'defaultRenderer': 'elk' } } }%%
 flowchart TD
     %% Title and Configuration
-    title["<b>SkillSwap Application Architecture</b>"]:::title
-    title -.- Root
+    title[<b>SkillSwap Application Architecture</b>]:::title
+    
     %% Main Application Structure
     Root[Root Layout] --> AuthProvider[Auth Provider]
     AuthProvider --> ThemeProvider[Theme Provider]
