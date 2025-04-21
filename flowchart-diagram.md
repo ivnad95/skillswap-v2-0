@@ -1,143 +1,115 @@
-%%{ init: { 'flowchart': { 'curve': 'basis', 'defaultRenderer': 'elk' } } }%%
+%{ init: { 'flowchart': { 'curve': 'basis', 'defaultRenderer': 'elk' } } }%%
 flowchart TD
     %% Title and Configuration
     title["<b>SkillSwap Application Architecture</b>"]:::title
     title -.- Root
 
-    %% Main Application Structure
-    Root[Root Layout] --> AuthProvider[Auth Provider]
-    AuthProvider --> ThemeProvider[Theme Provider]
-    ThemeProvider --> AppRoutes[App Routes]
+    %% Frontend Structure
+    subgraph Frontend
+        direction TB
+        Root[Root Layout] --> AuthProvider[Auth Provider]
+        AuthProvider --> ThemeProvider[Theme Provider]
+        ThemeProvider --> AppRoutes[App Routes]
+        
+        AppRoutes --> PublicRoutes[Public Routes]
+        AppRoutes --> ProtectedRoutes[Protected Routes]
 
-    %% App Routes Structure
-    AppRoutes --> PublicRoutes[Public Routes]
-    AppRoutes --> ProtectedRoutes[Protected Routes]
-    AppRoutes --> APIRoutes[API Routes]
+        PublicRoutes --> HomePage[Home Page]
+        PublicRoutes --> AboutPage[About Page]
+        PublicRoutes --> ContactPage[Contact Page]
+        PublicRoutes --> FeaturesPage[Features Page]
+        PublicRoutes --> PricingPage[Pricing Page]
+        PublicRoutes --> LoginPage[Login Page]
+        PublicRoutes --> SignupPage[Signup Page]
+        PublicRoutes --> VerifyEmailPage[Verify Email Page]
 
-    %% Public Routes
-    PublicRoutes Beit--> HomePage[Home Page]
-    PublicRoutes --> AboutPage[About Page]
-    PublicRoutes --> ContactPage[Contact Page]
-    PublicRoutes --> FeaturesPage[Features Page]
-    PublicRoutes --> PricingPage[Pricing Page]
-    PublicRoutes --> LoginPage[Login Page]
-    PublicRoutes --> SignupPage[Signup Page]
-    PublicRoutes --> VerifyEmailPage[Verify Email Page]
+        ProtectedRoutes --> DashboardLayout[Dashboard Layout]
+        DashboardLayout --> DashboardPage[Dashboard Page]
+        DashboardLayout --> ExplorePage[Explore Page]
+        DashboardLayout --> SessionsPage[Sessions Page]
+        DashboardLayout --> MessagesPage[Messages Page]
+        DashboardLayout --> CommunityPage[Community Page]
+        DashboardLayout --> ProfilePage[Profile Page]
+        DashboardLayout --> SettingsPage[Settings Page]
+        DashboardLayout --> BillingPage[Billing Page]
+        DashboardLayout --> SkillsPage[Skills Page]
 
-    %% Protected Routes with Dashboard Layout
-    ProtectedRoutes --> DashboardLayout[Dashboard Layout]
-    DashboardLayout --> DashboardPage[Dashboard Page]
-    DashboardLayout --> ExplorePage[Explore Page]
-    DashboardLayout --> SessionsPage[Sessions Page]
-    DashboardLayout --> MessagesPage[Messages Page]
-    DashboardLayout --> CommunityPage[Community Page]
-    DashboardLayout --> ProfilePage[Profile Page]
-    DashboardLayout --> SettingsPage[Settings Page]
-    DashboardLayout --> BillingPage[Billing Page]
-    DashboardLayout --> SkillsPage[Skills Page]
+        ProtectedRoutes --> OnboardingLayout[Onboarding Layout]
+        OnboardingLayout --> OnboardingPage[Onboarding Page]
+        OnboardingPage --> OnboardingComponent[Onboarding Component]
+        OnboardingComponent --> OnboardingSteps[Onboarding Steps]
 
-    %% Dashboard Page Implementation
-    DashboardPage --> DashboardPageClient[Dashboard Page Client]
-    DashboardPageClient --> TokenBalance
-    DashboardPageClient --> UpcomingSession
-    DashboardPageClient --> SkillCard
-    DashboardPageClient --> RecommendedMatches
+        OnboardingSteps --> WelcomeStep[Welcome Step]
+        OnboardingSteps --> PersonalInfoStep[Personal Info Step]
+        OnboardingSteps --> SkillsToTeachStep[Skills to Teach Step]
+        OnboardingSteps --> SkillsToLearnStep[Skills to Learn Step]
+        OnboardingSteps --> AvailabilityStep[Availability Step]
+        OnboardingSteps --> ProfilePhotoStep[Profile Photo Step]
+        OnboardingSteps --> CompleteStep[Complete Step]
+    end
 
-    %% Sessions Page Implementation
-    SessionsPage --> UpcomingSession
-    SessionsPage --> SessionHistory
-    SessionsPage --> Calendar
+    %% Backend Structure
+    subgraph Backend
+        direction TB
+        AppRoutes --> APIRoutes[API Routes]
 
-    %% Skills Page Implementation
-    SkillsPage --> SkillShowcase
-    SkillsPage --> Badge
+        APIRoutes --> AuthAPI[Auth API]
+        APIRoutes --> DbAPI[Database API]
+        APIRoutes --> ProfileAPI[Profile API]
+        APIRoutes --> SkillsAPI[Skills API]
+        APIRoutes --> SessionsAPI[Sessions API]
+        APIRoutes --> OnboardingAPI[Onboarding API]
+        APIRoutes --> AIAPI[AI API]
 
-    %% Community Page Implementation
-    CommunityPage --> Badge
-    CommunityPage --> Avatar
-    CommunityPage --> Card
+        AuthAPI --> SigninRoute[Signin Route]
+        AuthAPI --> SignupRoute[Signup Route]
+        AuthAPI --> VerifyRoute[Verify Route]
+        AuthAPI --> VerifyEmailRoute[Verify Email Route]
+        AuthAPI --> ResetPasswordRoute[Reset Password Route]
+        AuthAPI --> UpdatePasswordRoute[Update Password Route]
+        AuthAPI --> UserRoute[User Route]
 
-    %% Onboarding Flow
-    ProtectedRoutes --> OnboardingLayout[Onboarding Layout]
-    OnboardingLayout --> OnboardingPage[Onboarding Page]
-    OnboardingPage --> OnboardingComponent[Onboarding Component]
-    OnboardingComponent --> OnboardingSteps[Onboarding Steps]
+        DbAPI --> QueryRoute[Query Route]
+        DbAPI --> InsertRoute[Insert Route]
+        DbAPI --> UpdateRoute[Update Route]
+        DbAPI --> DeleteRoute[Delete Route]
 
-    %% Onboarding Steps
-    OnboardingSteps --> WelcomeStep[Welcome Step]
-    OnboardingSteps --> PersonalInfoStep[Personal Info Step]
-    OnboardingSteps --> SkillsToTeachStep[Skills to Teach Step]
-    OnboardingSteps --> SkillsToLearnStep[Skills to Learn Step]
-    OnboardingSteps --> AvailabilityStep[Availability Step]
-    OnboardingSteps --> ProfilePhotoStep[Profile Photo Step]
-    OnboardingSteps --> CompleteStep[Complete Step]
+        ProfileAPI --> ProfileRoute[Profile Route]
 
-    %% API Routes Structure
-    APIRoutes --> AuthAPI[Auth API]
-    APIRoutes --> DbAPI[Database API]
-    APIRoutes --> ProfileAPI[Profile API]
-    APIRoutes --> SkillsAPI[Skills API]
-    APIRoutes --> SessionsAPI[Sessions API]
-    APIRoutes --> OnboardingAPI[Onboarding API]
-    APIRoutes --> AIAPI[AI API]
+        SkillsAPI --> SkillsRoute[Skills Route]
+        SkillsAPI --> SkillByIdRoute[Skill by ID Route]
 
-    %% Auth API Routes
-    AuthAPI --> SigninRoute[Signin Route]
-    AuthAPI --> SignupRoute[Signup Route]
-    AuthAPI --> VerifyRoute[Verify Route]
-    AuthAPI --> VerifyEmailRoute[Verify Email Route]
-    AuthAPI --> ResetPasswordRoute[Reset Password Route]
-    AuthAPI --> UpdatePasswordRoute[Update Password Route]
-    AuthAPI --> UserRoute[User Route]
+        SessionsAPI --> SessionsRoute[Sessions Route]
+        SessionsAPI --> SessionByIdRoute[Session by ID Route]
 
-    %% Database API Routes
-    DbAPI --> QueryRoute[Query Route]
-    DbAPI --> InsertRoute[Insert Route]
-    DbAPI --> UpdateRoute[Update Route]
-    DbAPI --> DeleteRoute[Delete Route]
+        OnboardingAPI --> OnboardingCompleteRoute[Onboarding Complete Route]
+        OnboardingAPI --> OnboardingStatusRoute[Onboarding Status Route]
 
-    %% Profile API Routes
-    ProfileAPI --> ProfileRoute[Profile Route]
+        AIAPI --> AIAssistantRoute[AI Assistant Route]
+        AIAPI --> AISkillMatchingRoute[AI Skill Matching Route]
+        AIAPI --> AILearningRecommendationsRoute[AI Learning Recommendations Route]
+    end
 
-    %% Skills API Routes
-    SkillsAPI --> SkillsRoute[Skills Route]
-    SkillsAPI --> SkillByIdRoute[Skill by ID Route]
+    %% Shared Components
+    subgraph Shared
+        Middleware[Middleware] --> AppRoutes
 
-    %% Sessions API Routes
-    SessionsAPI --> SessionsRoute[Sessions Route]
-    SessionsAPI --> SessionByIdRoute[Session by ID Route]
+        AuthContext[Auth Context] --> AuthProvider
+        OnboardingContext[Onboarding Context] --> OnboardingComponent
 
-    %% Onboarding API Routes
-    OnboardingAPI --> OnboardingCompleteRoute[Onboarding Complete Route]
-    OnboardingAPI --> OnboardingStatusRoute[Onboarding Status Route]
+        DbLibrary[Database Library] --> DbAPI
+        DbClientLibrary[Database Client Library] --> DbAPI
+        AuthUtilsLibrary[Auth Utils Library] --> AuthAPI
+        AISkillMatchingLibrary[AI Skill Matching Library] --> AIAPI
+        UtilsLibrary[Utils Library] --> Components
 
-    %% AI API Routes
-    AIAPI --> AIAssistantRoute[AI Assistant Route]
-    AIAPI --> AISkillMatchingRoute[AI Skill Matching Route]
-    AIAPI --> AILearningRecommendationsRoute[AI Learning Recommendations Route]
+        UseMobileHook[Use Mobile Hook] --> Components
+        UseToastHook[Use Toast Hook] --> Components
 
-    %% Middleware
-    Middleware[Middleware] --> AppRoutes
-
-    %% Context Providers
-    AuthContext[Auth Context] --> AuthProvider
-    OnboardingContext[Onboarding Context] --> OnboardingComponent
-
-    %% Library Files
-    DbLibrary[Database Library] --> DbAPI
-    DbClientLibrary[Database Client Library] --> DbAPI
-    AuthUtilsLibrary[Auth Utils Library] --> AuthAPI
-    AISkillMatchingLibrary[AI Skill Matching Library] --> AIAPI
-    UtilsLibrary[Utils Library] --> Components
-
-    %% Hooks
-    UseMobileHook[Use Mobile Hook] --> Components
-    UseToastHook[Use Toast Hook] --> Components
-
-    %% Main Components
-    Components --> UIComponents[UI Components]
-    Components --> FeatureComponents[Feature Components]
-    Components --> LayoutComponents[Layout Components]
+        Components --> UIComponents[UI Components]
+        Components --> FeatureComponents[Feature Components]
+        Components --> LayoutComponents[Layout Components]
+    end
 
     %% UI Components
     UIComponents --> Button[Button]
