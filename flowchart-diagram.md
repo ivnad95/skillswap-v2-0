@@ -1,10 +1,3 @@
----
-config:
-  flowchart:
-    curve: basis
-    defaultRenderer: elk
-  theme: neo
----
 flowchart TD
     title["<b>SkillSwap Application Architecture</b>"]:::title
     title -.- Root
