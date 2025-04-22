@@ -411,6 +411,25 @@ export default function FeaturesPage() {
         </div>
       </section>
 
+      {/* Call to Action at Bottom */}
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-t from-background to-background/90">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+              Ready to Swap Skills?
+            </h2>
+            <p className="max-w-[600px] mx-auto text-muted-foreground md:text-xl">
+              Sign up now to join the SkillSwap community, teach, learn, and earn tokens!
+            </p>
+            <Link href="/signup">
+              <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                Get Started
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="w-full py-6 md:py-12 bg-background border-t border-border/40">
         <div className="container px-4 md:px-6">
