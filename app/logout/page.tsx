@@ -14,7 +14,7 @@ export default function LogoutPage() {
         await signOut()
         router.push("/")
       } catch (error) {
-        console.error("Error signing out:", error)
+        // Optionally add user-facing error handling here
       }
     }
 

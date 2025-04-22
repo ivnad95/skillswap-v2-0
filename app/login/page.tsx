@@ -22,19 +22,11 @@ export default function LoginPage() {
   const redirectParam = searchParams.get("redirect")
   const redirectTo = redirectParam || "/dashboard"
 
-  // console.log('Login page loaded with redirect parameter:', redirectParam, 'final redirectTo:', redirectTo) // Removed console.log
-
-  // Auto-login is disabled to prevent infinite loops
-  // The following useEffect block was commented out and has been removed for clarity.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      // console.log('Login form submitted, redirectTo:', redirectTo) // Removed console.log
-
-      // Use auth context consistently instead of direct fetch
-      // Pass redirectTo to signIn so AuthContext can handle redirection after onboarding check
       const { error } = await signIn(email, password, redirectTo)
       
       if (error) {
@@ -47,16 +39,10 @@ export default function LoginPage() {
         return
       }
 
-      // Success toast
       toast({
         title: "Success",
         description: "You have been signed in successfully.",
       })
-
-      // Redirection is handled within the signIn function in AuthContext
-      // after checking onboarding status. No need to router.push here.
-      // console.log('Login successful, redirecting to:', redirectTo) // Removed console.log
-      // router.push(redirectTo) // Removed redundant router.push
 
     } catch (error) {
       toast({

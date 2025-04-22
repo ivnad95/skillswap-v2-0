@@ -28,7 +28,6 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      // Use auth context
       const { error, needsEmailVerification } = await signUp(email, password, firstName, lastName)
 
       if (error) {
@@ -42,10 +41,8 @@ export default function SignupPage() {
       }
 
       if (needsEmailVerification) {
-        // Use router.push for consistent navigation
         router.push("/verify-email")
       } else {
-        // Redirect to login with redirect parameter
         toast({
           title: "Account created",
           description: "Your account has been created successfully. Please sign in.",
@@ -79,21 +76,21 @@ export default function SignupPage() {
               <div className="space-y-2">
                 <Input
                   id="firstName"
-                   placeholder="First Name"
-                   value={firstName}
-                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
-                   required
-                   disabled={isLoading}
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
+                  required
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
                 <Input
                   id="lastName"
-                   placeholder="Last Name"
-                   value={lastName}
-                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
-                   required
-                   disabled={isLoading}
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
+                  required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -101,22 +98,22 @@ export default function SignupPage() {
               <Input
                 id="email"
                 type="email"
-                 placeholder="Email"
-                 value={email}
-                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                 required
-                 disabled={isLoading}
+                placeholder="Email"
+                value={email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
               <Input
                 id="password"
                 type="password"
-                 placeholder="Password"
-                 value={password}
-                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                 required
-                 disabled={isLoading}
+                placeholder="Password"
+                value={password}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
                 minLength={8}
               />
             </div>

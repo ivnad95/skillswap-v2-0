@@ -114,7 +114,6 @@ export default function DashboardPage() {
    return (
      <div>
        <DashboardPageClient userData={userData} />
-       {/* Removed placeholder Component Diagram section */}
      </div>
    )
 }
