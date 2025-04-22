@@ -1201,7 +1201,7 @@ export function markMessagesAsRead(recipientId: string, senderId: string): DBRes
     `);
     // Mark messages sent by senderId to recipientId (current user) as read
     const info = stmt.run(recipientId, senderId);
-    console.log(`Marked ${info.changes} messages as read from ${senderId} for ${recipientId}`);
+    // console.log(`Marked ${info.changes} messages as read from ${senderId} for ${recipientId}`); // Removed log
     return { data: { success: true } };
   } catch (error) {
     console.error('Error marking messages as read:', error);

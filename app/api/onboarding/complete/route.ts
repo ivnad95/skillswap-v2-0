@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
     // Get the onboarding data from the request body
     const onboardingData = await req.json();
 
-    console.log('Onboarding data received:', onboardingData);
-    console.log('User ID:', userId);
+    // console.log('Onboarding data received:', onboardingData); // Removed log
+    // console.log('User ID:', userId); // Removed log
 
     // Complete the onboarding process
     const result = await completeUserOnboarding(userId, onboardingData);
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('Onboarding completed successfully');
+    // console.log('Onboarding completed successfully'); // Removed log
 
     // Set the onboarding-completed cookie
     const response = NextResponse.json({ success: true });

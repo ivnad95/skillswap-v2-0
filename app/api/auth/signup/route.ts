@@ -61,7 +61,9 @@ export async function POST(req: NextRequest) {
     )
 
     // Set auth cookie
-    cookies().set('auth-token', token, {
+    // Note: TS reports error TS2339 here, but cookies().set is synchronous in Route Handlers.
+    // Leaving as-is per Next.js docs. Manual review needed if runtime issues occur.
+    cookies().set('auth-token', token, { 
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // 1 week

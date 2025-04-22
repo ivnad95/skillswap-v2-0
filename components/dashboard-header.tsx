@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { SidebarNav } from "@/components/sidebar-nav"
 import { Logo } from "@/components/ui/logo"
 import { ThemeToggle } from "@/components/theme-toggle"
+import Image from "next/image"; // Import next/image
 
 export function DashboardHeader() {
   return (
@@ -45,10 +46,11 @@ export function DashboardHeader() {
             <span className="sr-only">Notifications</span>
           </Button>
           <Button variant="ghost" size="icon" className="rounded-full overflow-hidden">
-            <img
+            {/* Replaced img with next/image */}
+            <Image
               src="/profile-photo.png"
               alt="Profile"
-              className="rounded-full object-cover w-full h-full"
+              className="rounded-full object-cover" // Removed w-full h-full as next/image handles sizing
               width={32}
               height={32}
             />

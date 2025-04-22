@@ -8,6 +8,7 @@ import { SkillData } from "@/lib/db"; // Import SkillData type instead of getSki
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image"; // Import next/image
 
 // Define User type to replace Prisma's User
 interface User {
@@ -289,7 +290,14 @@ export default async function ExplorePage({
 
             <div className="mt-8">
                 <h2 className="text-2xl font-bold">Component Diagram</h2>
-                <img src="/docs/component-diagram.png" alt="Component Diagram" className="mt-4" />
+                {/* Replaced img with next/image. Adjust width/height as needed. */}
+                <Image 
+                  src="/docs/component-diagram.png" 
+                  alt="Component Diagram" 
+                  className="mt-4" 
+                  width={800} // Placeholder width
+                  height={600} // Placeholder height
+                />
             </div>
         </div>
     );

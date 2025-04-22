@@ -18,12 +18,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Special case for test@example.com - we know it already exists
-    // No need to try to create it again, just log for debugging
-    if (email === 'test@example.com' && password === 'password123') {
-      console.log('Using test user credentials')
-    }
+    // No need to try to create it again
+    // if (email === 'test@example.com' && password === 'password123') {
+    //   console.log('Using test user credentials') // Removed log
+    // }
 
-    console.log('Verifying user:', email)
+    // console.log('Verifying user:', email) // Removed log
 
     const result = await verifyUser(email, password)
 
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       { expiresIn: JWT_EXPIRY }
     )
 
-    console.log('Login successful, generated token for user:', user.id)
+    // console.log('Login successful, generated token for user:', user.id) // Removed log
 
     // Correct way to set cookie: on the NextResponse object
     const response = NextResponse.json({

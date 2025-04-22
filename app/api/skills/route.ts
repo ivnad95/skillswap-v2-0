@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
       'skills',
       null,
       false,
-      `Unexpected error: ${error.message}`
+      `Unexpected error: ${error instanceof Error ? error.message : String(error)}` // Type check error
     );
     return NextResponse.json(
       { error: { message: "An unexpected error occurred" } },
@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
       'skill',
       null,
       false,
-      `Unexpected error: ${error.message}`
+      `Unexpected error: ${error instanceof Error ? error.message : String(error)}` // Type check error
     );
     return NextResponse.json(
       { error: { message: "An unexpected error occurred" } },

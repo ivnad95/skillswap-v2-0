@@ -133,7 +133,7 @@ export async function PUT(req: NextRequest) {
     }
     
     const profileData = await req.json();
-    console.log('Received profile update with data keys:', Object.keys(profileData));
+    // console.log('Received profile update with data keys:', Object.keys(profileData)); // Removed log
     
     // Update the user's profile
     const result = updateUserProfile(userId, profileData);

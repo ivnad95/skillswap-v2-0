@@ -108,7 +108,7 @@ export function PaymentSettings() {
  
   const handleSetDefaultMethod = (id: string) => {
     // TODO: Implement API call to set default payment method
-    console.log("Set default:", id);
+    // console.log("Set default:", id); // Removed log
      setDefaultPaymentMethodId(id);
      // Update local state optimistically or after API success
      setPaymentMethods((prev: PaymentMethod[]) => prev.map((m: PaymentMethod) => ({ ...m, isDefault: m.id === id }))); // Add types for prev and m
@@ -117,19 +117,19 @@ export function PaymentSettings() {
 
   const handleAddMethod = () => {
     // TODO: Implement logic to open a modal or redirect to add payment method (likely involves Stripe Elements or similar)
-    console.log("Add payment method clicked");
+    // console.log("Add payment method clicked"); // Removed log
     toast({ title: "Info", description: "Add payment method functionality not yet implemented." });
   };
 
   const handleEditMethod = (id: string) => {
      // TODO: Implement logic to open an edit modal for the payment method
-     console.log("Edit payment method clicked:", id);
+     // console.log("Edit payment method clicked:", id); // Removed log
      toast({ title: "Info", description: "Edit payment method functionality not yet implemented." });
   };
 
   const handleChangePlan = () => {
      // TODO: Implement logic to change subscription plan
-     console.log("Change plan clicked");
+     // console.log("Change plan clicked"); // Removed log
      toast({ title: "Info", description: "Change plan functionality not yet implemented." });
   };
 

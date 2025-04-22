@@ -32,7 +32,7 @@ type UserData = {
 }
 
 export default function DashboardPageClient({ userData }: { userData: UserData }) {
-  const { user, isLoading } = useAuth()
+  const { user, loading } = useAuth() // Changed isLoading to loading
   const router = useRouter()
   const [welcomeMessage, setWelcomeMessage] = useState<string>("")
   const [aiRecommendations, setAiRecommendations] = useState<string[]>([])
@@ -70,7 +70,7 @@ export default function DashboardPageClient({ userData }: { userData: UserData }
     loadAiContent()
   }, [userData])
 
-  if (isLoading) {
+  if (loading) { // Changed isLoading to loading
     return <div>Loading...</div>
   }
 

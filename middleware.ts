@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie") || ""
   const authToken = cookieHeader.split(';')
     .map((cookie: string) => cookie.trim().split('=')) // Add type for 'cookie'
-    .find(([key]: [string]) => key === 'auth-token')?.[1] // Add type for '[key]'
+    .find(([key]: string[]) => key === 'auth-token')?.[1] // Changed type from [string] to string[]
 
   // Check if the user is authenticated
   let hasSession = false

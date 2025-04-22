@@ -71,7 +71,7 @@ export default function ProfilePage() {
       }
       
       const data = await response.json()
-      console.log("Fetched profile data:", data.profile)
+      // console.log("Fetched profile data:", data.profile) // Removed log
       setProfileData(data.profile)
     } catch (error) {
       console.error("Error fetching profile data:", error)

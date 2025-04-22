@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"; // Import next/image
 
 export function HeroSection() {
   return (
@@ -27,7 +28,8 @@ export function HeroSection() {
           </div>
           <div className="flex items-center justify-center">
             <div className="rounded-lg overflow-hidden bg-openai-gradient-blue-yellow p-1">
-              <img
+              {/* Replaced img with next/image */}
+              <Image
                 src="/diverse-group-city.png"
                 alt="Diverse group of people exchanging skills"
                 className="aspect-video overflow-hidden rounded-lg object-cover object-center sm:w-full lg:order-last"
