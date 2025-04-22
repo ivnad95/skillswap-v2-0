@@ -5,10 +5,11 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // Assuming card path
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Assuming avatar path
 import { Badge } from "@/components/ui/badge"; // Assuming badge path
-import { Skeleton } from "@/components/ui/skeleton"; // Assuming skeleton path
-// Import other necessary components like SkillShowcase, ReviewsSection, etc. if they exist and are reusable
+import { Skeleton } from "@/components/ui/skeleton";
+import { SkillShowcase } from "@/components/skill-showcase"; // Import SkillShowcase
+import { ReviewsSection } from "@/components/reviews-section"; // Import ReviewsSection
 
-// Define a type for the user profile data (replace with actual structure)
+// Define a type for the user profile data (align with API response)
 type UserProfile = {
   id: string;
   firstName: string;
@@ -16,9 +17,11 @@ type UserProfile = {
   bio: string;
   location: string;
   profileImage: string | null;
-  teachingSkills: string[]; // Or a more complex Skill object array
-  learningSkills: string[]; // Or a more complex Skill object array
-  // Add other relevant fields: reviews, average rating, sessions taught/learned, etc.
+  coverImage: string | null; // Added from API response
+  createdAt: string; // Added from API response
+  skills: any[]; // Use specific Skill type if defined elsewhere
+  reviews: any[]; // Use specific Review type if defined elsewhere
+  // Add firstName, lastName if API is updated to include them
 };
 
 export default function UserProfilePage() {
@@ -35,10 +38,8 @@ export default function UserProfilePage() {
       setLoading(true);
       setError(null);
       try {
-        // Fetch actual profile data
-        // Note: This assumes /api/profile handles fetching other users' profiles by ID.
-        // If not, a different endpoint like /api/users/{userId}/profile might be needed.
-        const response = await fetch(`/api/profile/${userId}`); // Use the userId from params
+        // Fetch actual profile data from the specific user endpoint
+        const response = await fetch(`/api/profile/${userId}`);
         const data = await response.json();
 
         if (!response.ok) {
@@ -85,15 +86,18 @@ export default function UserProfilePage() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
+      {/* TODO: Use ProfileHeader component if suitable */}
       <Card>
         <CardHeader className="flex flex-row items-center space-x-4">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={profile.profileImage || undefined} alt={`${profile.firstName} ${profile.lastName}`} />
+             {/* Use profileImage */}
+            <AvatarImage src={profile.profileImage || '/placeholder-user.jpg'} alt={`${profile.firstName || ''} ${profile.lastName || ''}`} />
             <AvatarFallback>{profile.firstName?.[0]}{profile.lastName?.[0]}</AvatarFallback>
           </Avatar>
           <div>
-            <CardTitle className="text-2xl">{profile.firstName} {profile.lastName}</CardTitle>
-            <CardDescription>{profile.location}</CardDescription>
+             {/* Display name - requires joining users table in API */}
+            <CardTitle className="text-2xl">{profile.firstName || 'User'} {profile.lastName || ''}</CardTitle>
+            <CardDescription>{profile.location || 'Location unknown'}</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
@@ -101,38 +105,11 @@ export default function UserProfilePage() {
         </CardContent>
       </Card>
 
-      {/* TODO: Integrate SkillShowcase component for teachingSkills */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Skills Taught</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          {profile.teachingSkills.map(skill => <Badge key={skill}>{skill}</Badge>)}
-          {profile.teachingSkills.length === 0 && <p className="text-sm text-muted-foreground">No skills being taught yet.</p>}
-        </CardContent>
-      </Card>
+      {/* Integrate SkillShowcase */}
+      <SkillShowcase profileData={profile} />
 
-      {/* TODO: Integrate SkillShowcase component for learningSkills */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Skills Learning</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          {profile.learningSkills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>)}
-           {profile.learningSkills.length === 0 && <p className="text-sm text-muted-foreground">No skills being learned yet.</p>}
-        </CardContent>
-      </Card>
-
-      {/* TODO: Integrate ReviewsSection component */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Reviews</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">(Reviews placeholder)</p>
-        </CardContent>
-      </Card>
-
+      {/* Integrate ReviewsSection */}
+      <ReviewsSection profileData={profile} />
       {/* TODO: Add button to request session? */}
     </div>
   );

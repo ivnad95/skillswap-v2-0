@@ -58,15 +58,8 @@ export async function POST(req: NextRequest) {
 
     console.log('Login successful, generated token for user:', user.id)
 
-    // Set auth cookie
-    cookies().set('auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 1 week
-      path: '/',
-    });
-
-    return NextResponse.json({
+    // Correct way to set cookie: on the NextResponse object
+    const response = NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
@@ -74,7 +67,18 @@ export async function POST(req: NextRequest) {
         lastName: user.lastName,
       },
       token,
-    })
+    });
+
+    // Set the cookie on the response
+    response.cookies.set('auth-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: '/',
+    });
+
+    return response; // Return the response with the cookie set
+
   } catch (error) {
     console.error("Error in signin route:", error)
     return NextResponse.json(

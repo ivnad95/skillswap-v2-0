@@ -40,10 +40,10 @@ export interface ProfileData {
   socialLinks?: Record<string, string>;
   profileImage?: string | null;
   coverImage?: string | null;
-  availability?: any[];
+  availability?: any[]; // Keep as any for now, define specific type later if needed
   skills?: Skill[];
-  reviews?: any[];
-  sessions?: any[];
+  reviews?: any[]; // Keep as any for now, define specific Review type later if needed
+  sessions?: any[]; // Keep as any for now, define specific Session type later if needed
   learningPreferences?: Record<string, any>;
   onboardingCompleted?: boolean;
   createdAt?: string;

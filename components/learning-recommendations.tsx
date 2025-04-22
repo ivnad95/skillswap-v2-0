@@ -119,19 +119,27 @@ export function LearningRecommendations() {
     setError(null)
 
     try {
-      // TODO: Fetch actual userProfile, learningHistory, and goals data here
-      // const profileRes = await fetch('/api/profile');
-      // const historyRes = await fetch('/api/sessions?status=completed'); // Example
-      // const goalsRes = await fetch('/api/goals'); // Example
-      // const userProfile = await profileRes.json();
-      // const learningHistory = await historyRes.json();
-      // const goals = await goalsRes.json();
+      // Fetch actual user profile data
+      const profileRes = await fetch('/api/profile');
+      if (!profileRes.ok) throw new Error('Failed to fetch user profile for recommendations');
+      const profileData = await profileRes.json();
+      const userProfile = profileData.profile; // Assuming API returns { profile: ... }
 
-      // Using sample data for the request body for now
+      // TODO: Fetch actual learning history (e.g., completed sessions/skills)
+      const learningHistory = sampleLearningHistory; // Using sample for now
+
+      // TODO: Fetch actual user goals (requires new API/DB implementation)
+      const goals = sampleGoals; // Using sample for now
+
+      // Construct request body with (partially) real data
       const requestBody = {
-        userProfile: sampleUserProfile,
-        learningHistory: sampleLearningHistory,
-        goals: sampleGoals,
+        userProfile: { // Map fetched profile data to expected structure
+            name: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
+            currentSkills: userProfile.skills?.map((s: any) => ({ name: s.title, level: s.level })) || [],
+            // Add learningPreferences, availableTime if available in profileData
+        },
+        learningHistory, // Still using sample
+        goals, // Still using sample
       };
 
       const response = await fetch("/api/ai-learning-recommendations", {

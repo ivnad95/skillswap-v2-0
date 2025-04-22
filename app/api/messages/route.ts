@@ -1,23 +1,68 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { verifyToken, createMessage, getMessagesBetweenUsers, DbMessage } from '@/lib/db'; // Import DB functions
+import { getUserIdFromRequest } from '@/lib/auth-utils'; // Use utility to get user ID
 
-// Placeholder: Fetch user's conversations/messages
+// Fetch messages between the authenticated user and another user
 export async function GET(request: NextRequest) {
-  // TODO: Implement logic:
-  // 1. Verify user authentication (e.g., using verifyToken from lib/db)
-  // 2. Fetch conversations/messages for the authenticated user from the database
-  // 3. Return the messages or an appropriate error response
-  return NextResponse.json({ message: "GET /api/messages not implemented" }, { status: 501 });
+  const userId1 = getUserIdFromRequest(request); // Get current user ID
+  if (!userId1) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const userId2 = searchParams.get('userId'); // Get the other user's ID from query param
+
+  if (!userId2) {
+    return NextResponse.json({ error: 'Missing userId query parameter' }, { status: 400 });
+  }
+
+  const result = getMessagesBetweenUsers(userId1, userId2);
+
+  if (result.error) {
+    return NextResponse.json({ error: result.error.message || 'Failed to retrieve messages' }, { status: 500 });
+  }
+
+  return NextResponse.json({ messages: result.data });
 }
 
-// Placeholder: Send a new message
+// Send a new message
 export async function POST(request: NextRequest) {
-  // TODO: Implement logic:
-  // 1. Verify user authentication
-  // 2. Parse request body (e.g., recipientId, content)
-  // 3. Validate input
-  // 4. Save the new message to the database
-  // 5. Return success response or error
-  // const body = await request.json();
-  return NextResponse.json({ message: "POST /api/messages not implemented" }, { status: 501 });
+  const senderId = getUserIdFromRequest(request); // Get sender (current user) ID
+  if (!senderId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const body = await request.json();
+    const { recipientId, content } = body;
+
+    if (!recipientId || !content) {
+      return NextResponse.json({ error: 'Missing recipientId or content in request body' }, { status: 400 });
+    }
+
+    if (typeof content !== 'string' || content.trim().length === 0) {
+       return NextResponse.json({ error: 'Message content cannot be empty' }, { status: 400 });
+    }
+
+     if (senderId === recipientId) {
+       return NextResponse.json({ error: 'Cannot send message to yourself' }, { status: 400 });
+    }
+
+    const result = createMessage(senderId, recipientId, content.trim());
+
+    if (result.error) {
+      return NextResponse.json({ error: result.error.message || 'Failed to send message' }, { status: 500 });
+    }
+
+    // Optionally return the created message ID or the full message object
+    return NextResponse.json({ message: "Message sent successfully", messageId: result.data.id }, { status: 201 });
+
+  } catch (error) {
+    console.error("Error processing POST /api/messages:", error);
+    if (error instanceof SyntaxError) {
+       return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
+    }
+    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
+  }
 }

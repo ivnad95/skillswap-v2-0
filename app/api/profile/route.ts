@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserIdFromRequest, logSecurityEvent } from "@/lib/auth-utils";
-import { getUserProfile, updateUserProfile, getUserSkills, DBError } from "@/lib/db";
+import { getUserProfile, updateUserProfile, getUserSkills, getUserReviews, DBError } from "@/lib/db"; // Added getUserReviews
 
 // GET the authenticated user's profile
 export async function GET(req: NextRequest) {
@@ -33,10 +33,14 @@ export async function GET(req: NextRequest) {
         { status: 401 }
       );
     }
-    
-    // Get the user's profile
-    const profileResult = getUserProfile(userId);
-    
+
+    // Fetch profile, skills, and reviews in parallel
+    const [profileResult, skillsResult, reviewsResult] = await Promise.all([
+      getUserProfile(userId),
+      getUserSkills(userId),
+      getUserReviews(userId) // Fetch reviews
+    ]);
+
     if (profileResult.error) {
       const errorMessage = (profileResult.error as DBError).message || "Failed to get profile";
       logSecurityEvent(
@@ -53,10 +57,15 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
-    
-    // Get the user's skills as well
-    const skillsResult = getUserSkills(userId);
-    
+
+    // Log errors for skills/reviews but don't fail the request
+    if (skillsResult.error) {
+       console.error(`Failed to get skills for user ${userId}:`, skillsResult.error.message);
+    }
+     if (reviewsResult.error) {
+       console.error(`Failed to get reviews for user ${userId}:`, reviewsResult.error.message);
+    }
+
     logSecurityEvent(
       userId,
       'GET',
@@ -66,11 +75,12 @@ export async function GET(req: NextRequest) {
       'Successfully retrieved user profile'
     );
     
-    // Return both profile and skills
-    return NextResponse.json({ 
+    // Return profile, skills, and reviews
+    return NextResponse.json({
       profile: {
         ...profileResult.data,
-        skills: skillsResult.error ? [] : skillsResult.data
+        skills: skillsResult.data || [], // Default to empty array on error
+        reviews: reviewsResult.data || [] // Default to empty array on error
       }
     });
   } catch (error) {
@@ -81,7 +91,7 @@ export async function GET(req: NextRequest) {
       'profile',
       null,
       false,
-      `Unexpected error: ${error.message}`
+      `Unexpected error: ${error instanceof Error ? error.message : String(error)}` // Type check error
     );
     return NextResponse.json(
       { error: { message: "An unexpected error occurred" } },
@@ -163,7 +173,7 @@ export async function PUT(req: NextRequest) {
       'profile',
       null,
       false,
-      `Unexpected error: ${error.message}`
+      `Unexpected error: ${error instanceof Error ? error.message : String(error)}` // Type check error
     );
     return NextResponse.json(
       { error: { message: "An unexpected error occurred" } },

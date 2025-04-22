@@ -18,15 +18,17 @@ interface User {
   profileImage?: string | null;
 }
 
-// Define more specific types if needed
+// Define type for teacher data fetched from API (should match PopulatedTeacherData from lib/db.ts)
 interface PopulatedTeacher {
   id: string;
-  name: string;
-  avatar?: string | null;
-  title?: string;
-  rating?: number;
-  students?: number;
-  skillsTeaching: { skill: { name: string } }[];
+  firstName: string | null;
+  lastName: string | null;
+  profileImage: string | null;
+  bio: string | null;
+  averageRating: number | null; // Added
+  ratingCount: number; // Added
+  sessionCount: number; // Added
+  skillsTeaching: string[]; // Added
 }
 
 // Mock extended SkillData that includes the UI-specific fields
@@ -110,12 +112,18 @@ export default async function ExplorePage({
         const skillsData = await skillsResponse.json();
         skills = skillsData.skills || skillsData || []; // Adjust based on actual API response structure
 
-        // TODO: Fetch teachers when API endpoint is available
-        // const teachersResponse = await fetch(`/api/teachers?search=${encodeURIComponent(searchQuery)}`);
-        // if (!teachersResponse.ok) throw new Error('Failed to load teachers');
-        // const teachersData = await teachersResponse.json();
-        // teachers = teachersData.teachers || [];
-        teachers = []; // Keep teachers empty for now
+        // Fetch teachers using the new API endpoint
+        const teachersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/teachers?search=${encodeURIComponent(searchQuery)}`);
+        if (!teachersResponse.ok) {
+           const teachersError = await teachersResponse.json();
+           // Log error but don't block the page load
+           console.error('Failed to load teachers:', teachersError.message || teachersError.error);
+           teachers = [];
+        } else {
+           const teachersData = await teachersResponse.json();
+           teachers = teachersData.teachers || []; // Adjust based on actual API response structure
+        }
+
 
         isLoading = false;
     } catch (err) {
@@ -219,15 +227,16 @@ export default async function ExplorePage({
                             ))
                         ) : teachers.length > 0 ? (
                             // Render actual teacher cards when data is available
+                            // Adjust props based on PopulatedTeacherData structure from lib/db.ts
                             teachers.map((teacher) => (
                                 <ExploreTeacherCard
                                     key={teacher.id}
-                                    name={teacher.name || ""}
-                                    avatar={teacher.avatar || "/placeholder-user.jpg"}
-                                    title={teacher.title || ""}
-                                    rating={teacher.rating || 0}
-                                    students={teacher.students || 0}
-                                    skills={teacher.skillsTeaching.map((st) => st.skill.name)}
+                                    name={`${teacher.firstName || ''} ${teacher.lastName || ''}`.trim()}
+                                    avatar={teacher.profileImage || "/placeholder-user.jpg"}
+                                    title={teacher.bio?.substring(0, 50) + (teacher.bio && teacher.bio.length > 50 ? '...' : '') || "Teacher"} // Use bio snippet as title
+                                    rating={teacher.averageRating || 0} // Use fetched rating
+                                    students={teacher.sessionCount || 0} // Use session count as student count proxy
+                                    skills={teacher.skillsTeaching || []} // Use fetched skills
                                 />
                             ))
                         ) : (

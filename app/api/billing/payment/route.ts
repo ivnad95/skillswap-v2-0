@@ -1,35 +1,57 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getUserIdFromRequest } from '@/lib/auth-utils';
+// import Stripe from 'stripe'; // Example: Import Stripe SDK if used
 
-// Placeholder: Fetch user's payment methods/history
+// Fetch user's payment methods/history (Placeholder)
 export async function GET(request: NextRequest) {
-  // TODO: Implement logic:
-  // 1. Verify user authentication
-  // 2. Fetch payment methods/history from DB or payment provider (e.g., Stripe)
-  // 3. Return data or error
-  return NextResponse.json({ message: "GET /api/billing/payment not implemented" }, { status: 501 });
+  const userId = getUserIdFromRequest(request);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // TODO: Replace with actual logic to fetch from Stripe or DB
+  const mockMethods = [
+    { id: "card_mock_1", type: "visa", last4: "4242", expiryMonth: "12", expiryYear: "25", isDefault: true },
+  ];
+  const mockBillingInfo = { name: "Mock User", address: "123 Mock St", city: "Mockville", state: "MC", zip: "12345", country: "Mockland" };
+  const mockSubscription = { planName: "Free Tier", price: "$0/month", renewalDate: "N/A", status: "Active" };
+
+  return NextResponse.json({
+      methods: mockMethods,
+      billingInfo: mockBillingInfo,
+      subscription: mockSubscription
+  });
 }
 
-// Placeholder: Process a payment (e.g., buy tokens, add method)
+// Process a payment (e.g., buy tokens, add method) - Requires Payment Provider Integration
 export async function POST(request: NextRequest) {
-  // TODO: Implement logic:
-  // 1. Verify user authentication
-  // 2. Parse request body (e.g., paymentMethodId, amount, action)
-  // 3. Interact with payment provider (e.g., Stripe) to process payment or save method
-  // 4. Update user's token balance or saved methods in DB
-  // 5. Return success or error
-  // const body = await request.json();
-  return NextResponse.json({ message: "POST /api/billing/payment not implemented" }, { status: 501 });
+   const userId = getUserIdFromRequest(request);
+   if (!userId) {
+     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+   }
+
+  // TODO: Implement payment provider integration (e.g., Stripe)
+  // 1. Parse request body (action, amount, paymentMethodId, etc.)
+  // 2. Create Stripe Customer if not exists
+  // 3. Create PaymentIntent or SetupIntent based on action
+  // 4. Confirm payment/setup
+  // 5. Update DB (e.g., token balance, saved payment method)
+  console.warn("POST /api/billing/payment needs payment provider integration.");
+  return NextResponse.json({ message: "Payment processing not implemented. Requires integration with a payment provider like Stripe." }, { status: 501 });
 }
 
-// Placeholder: Update payment method (e.g., set default) or plan
+// Update payment method (e.g., set default) or plan - Requires Payment Provider Integration
 export async function PUT(request: NextRequest) {
-  // TODO: Implement logic:
-  // 1. Verify user authentication
-  // 2. Parse request body (e.g., paymentMethodId, isDefault, newPlanId)
-  // 3. Update default payment method in DB or payment provider
-  // 4. Update subscription plan with payment provider and in DB
-  // 5. Return success or error
-  // const body = await request.json();
-  return NextResponse.json({ message: "PUT /api/billing/payment not implemented" }, { status: 501 });
+   const userId = getUserIdFromRequest(request);
+   if (!userId) {
+     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+   }
+
+  // TODO: Implement payment provider integration (e.g., Stripe)
+  // 1. Parse request body (action, paymentMethodId, planId, etc.)
+  // 2. Update default payment method via Stripe API / DB
+  // 3. Update subscription via Stripe API / DB
+  console.warn("PUT /api/billing/payment needs payment provider integration.");
+  return NextResponse.json({ message: "Updating payment methods/subscription not implemented. Requires integration with a payment provider like Stripe." }, { status: 501 });
 }

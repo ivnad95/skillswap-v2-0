@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button"
 import { Star } from "lucide-react"
 import { ProfileData } from "@/app/(dashboard)/profile/page"
 
+// Align Review type more closely with UserReviewData from lib/db.ts
 interface Review {
   id?: string | number;
   reviewer?: {
-    name?: string;
-    avatar?: string;
+    id?: string; // Added reviewer ID
+    firstName?: string | null; // Use firstName
+    lastName?: string | null; // Use lastName
+    profileImage?: string | null; // Use profileImage for avatar
   };
   rating: number;
   comment: string;
@@ -39,11 +42,14 @@ export function ReviewsSection({ profileData }: ReviewsSectionProps) {
           <div className="flex items-start justify-between">
             <div className="flex items-center">
               <Avatar className="h-10 w-10 mr-3">
-                <AvatarImage src={review.reviewer?.avatar} />
-                <AvatarFallback>{review.reviewer?.name?.[0] || "U"}</AvatarFallback>
+                 {/* Use profileImage */}
+                <AvatarImage src={review.reviewer?.profileImage || undefined} />
+                 {/* Generate fallback from first/last name */}
+                <AvatarFallback>{review.reviewer?.firstName?.[0] || ''}{review.reviewer?.lastName?.[0] || 'U'}</AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="font-medium">{review.reviewer?.name || "Anonymous"}</h3>
+                 {/* Combine first and last name */}
+                <h3 className="font-medium">{`${review.reviewer?.firstName || ''} ${review.reviewer?.lastName || ''}`.trim() || "Anonymous"}</h3>
                 <div className="flex items-center text-amber-500">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star 

@@ -1,50 +1,19 @@
-import type { Metadata } from "next"
-import { DashboardShell } from "@/components/dashboard-shell"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar } from "@/components/ui/calendar"
-import { UpcomingSession } from "@/components/upcoming-session"
-import { SessionHistory } from "@/components/session-history"
-import { CalendarPlus, AlertCircle, Loader2 } from "lucide-react"
-// Removed getUserIdFromRequest import as we'll use verifyToken directly
-import { getUserSessions, DbSession, verifyToken } from "@/lib/db" // Import verifyToken
-import { redirect } from "next/navigation"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Skeleton } from "@/components/ui/skeleton"
-import { cookies } from "next/headers"
+"use client"; // Convert to Client Component
 
-// Define our own Session type to replace Prisma's
-interface Session {
-  id: string;
-  teacherId: string;
-  learnerId: string;
-  skillId: string;
-  scheduledTime: string;
-  status: string;
-  notes?: string | null;
-  tokenAmount?: number;
-}
-
-// Define types for session data
-interface PopulatedSession {
-  id: string;
-  teacherId: string;
-  learnerId: string;
-  skillId: string;
-  scheduledTime: string;
-  status: string;
-  notes?: string | null;
-  tokenAmount?: number;
-  teacher: { id: string; firstName: string | null; lastName: string | null; imageUrl?: string | null }
-  learner: { id: string; firstName: string | null; lastName: string | null; imageUrl?: string | null }
-  skill: { id: string; name: string }
-}
-
-export const metadata: Metadata = {
-  title: "Sessions | SkillSwap",
-  description: "Manage your teaching and learning sessions",
-}
+import { useState, useEffect, useCallback } from "react";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import { UpcomingSession } from "@/components/upcoming-session";
+import { SessionHistory } from "@/components/session-history";
+import { CalendarPlus, AlertCircle, Loader2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SessionScheduleModal } from "@/components/session-schedule-modal";
+import { PopulatedDbSession as PopulatedSessionType } from "@/lib/db"; // Import type
+import { useAuth } from "@/contexts/auth-context"; // Use auth context for user ID
 
 // Loading skeleton for upcoming sessions
 function UpcomingSessionSkeleton() {
@@ -60,83 +29,67 @@ function UpcomingSessionSkeleton() {
   );
 }
 
-export default async function SessionsPage() {
-  // Directly get user ID from token using verifyToken
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get('auth-token')?.value;
-  let userId: string | null = null;
+export default function SessionsPage() {
+  const { user, loading: authLoading } = useAuth(); // Get user from context
+  const [upcomingSessions, setUpcomingSessions] = useState<PopulatedSessionType[]>([]);
+  const [pastSessions, setPastSessions] = useState<PopulatedSessionType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (authToken) {
-    const verificationResult = verifyToken(authToken);
-    // Define expected shape of decoded user payload
-    type DecodedUser = { id: string; [key: string]: any };
-    // Safely access user ID from decoded token with type assertion
-    const decodedUser = verificationResult.data?.session?.user as DecodedUser | undefined;
-    userId = decodedUser?.id || null;
-  }
+  // Fetch session data function
+  const fetchSessionData = useCallback(async () => {
+    if (!user) return; // Need user to fetch sessions
 
-  if (!userId) {
-    redirect("/login"); // Redirect if no token or token is invalid
-  }
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Fetch sessions using the API route
+      const response = await fetch('/api/sessions'); // GET /api/sessions fetches current user's sessions
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || errorData.error || "Failed to load sessions");
+      }
+      const sessionsResult = await response.json();
+      const allSessions: PopulatedSessionType[] = sessionsResult.sessions || []; // Adjust based on API response
 
-  let upcomingSessions: PopulatedSession[] = []
-  let pastSessions: PopulatedSession[] = []
-  let isLoading = true
-  let error: string | null = null
+      const now = new Date();
+      setUpcomingSessions(allSessions.filter((session) => new Date(session.start_time) >= now));
+      setPastSessions(allSessions.filter((session) => new Date(session.start_time) < now));
 
-  try {
-    const sessionsResult = await getUserSessions(userId)
-    
-    // Handle potential error
-    if (sessionsResult.error) {
-      error = sessionsResult.error.message || "Failed to load sessions";
-      isLoading = false;
-      return;
+    } catch (err) {
+      console.error("Failed to fetch sessions:", err);
+      setError(err instanceof Error ? err.message : "Failed to load sessions. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
-    
-    const allSessions = sessionsResult.data;
-    const now = new Date()
-    
-    // Now we can safely filter the data
-    upcomingSessions = allSessions
-      .filter(session => new Date(session.start_time) >= now)
-      .map(session => ({
-        id: session.id,
-        teacherId: session.teacher_id,
-        learnerId: session.learner_id,
-        skillId: session.skill_id,
-        scheduledTime: session.start_time,
-        status: session.status,
-        notes: session.notes,
-        tokenAmount: 10, // Revert to Placeholder - DbSession type doesn't have token_amount
-        // Revert to Placeholders - DbSession type doesn't have populated relations
-        teacher: { id: session.teacher_id, firstName: "Teacher", lastName: "Name", imageUrl: null },
-        learner: { id: session.learner_id, firstName: "Learner", lastName: "Name", imageUrl: null },
-        skill: { id: session.skill_id, name: "Skill Name" }
-      }));
+  }, [user]); // Depend on user
 
-    pastSessions = allSessions
-      .filter(session => new Date(session.start_time) < now)
-      .map(session => ({
-        id: session.id,
-        teacherId: session.teacher_id,
-        learnerId: session.learner_id,
-        skillId: session.skill_id,
-        scheduledTime: session.start_time,
-        status: session.status,
-        notes: session.notes,
-        tokenAmount: 10, // Revert to Placeholder - DbSession type doesn't have token_amount
-        // Revert to Placeholders - DbSession type doesn't have populated relations
-        teacher: { id: session.teacher_id, firstName: "Teacher", lastName: "Name", imageUrl: null },
-        learner: { id: session.learner_id, firstName: "Learner", lastName: "Name", imageUrl: null },
-        skill: { id: session.skill_id, name: "Skill Name" }
-      }));
+  // Fetch data when user is available
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchSessionData();
+    } else if (!authLoading && !user) {
+      // Handle case where user is definitely not logged in (e.g., redirect or show message)
+      // This might be redundant if middleware handles redirects properly
+      setIsLoading(false);
+      setError("Please log in to view sessions.");
+    }
+  }, [user, authLoading, fetchSessionData]);
 
-    isLoading = false
-  } catch (err) {
-    console.error("Failed to fetch sessions:", err)
-    error = "Failed to load sessions. Please try again later."
-    isLoading = false
+  // Handle session scheduled callback to refresh data
+  const handleSessionScheduled = () => {
+    fetchSessionData(); // Re-fetch sessions after a new one is scheduled
+  };
+
+  // Show loading state while auth is loading or sessions are fetching
+  if (authLoading || (isLoading && !error)) {
+     return (
+      <DashboardShell>
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardShell>
+    );
   }
 
   return (
@@ -146,121 +99,112 @@ export default async function SessionsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Sessions</h1>
           <p className="text-muted-foreground">Manage your teaching and learning sessions.</p>
         </div>
-        <Button variant="gradient">
-          <CalendarPlus className="mr-2 h-4 w-4" /> Schedule Session
-        </Button>
+        {/* Use the SessionScheduleModal component */}
+        <SessionScheduleModal onSessionScheduled={handleSessionScheduled} />
       </div>
 
-      <Tabs defaultValue="upcoming" className="mt-6">
-        <TabsList className="bg-background/50 backdrop-blur-sm">
-          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
-          <TabsTrigger value="calendar">Calendar</TabsTrigger>
-        </TabsList>
+      {error && !isLoading && (
+         <Alert variant="destructive" className="mt-6">
+           <AlertCircle className="h-4 w-4" />
+           <AlertTitle>Error</AlertTitle>
+           <AlertDescription>{error}</AlertDescription>
+         </Alert>
+      )}
 
-        <TabsContent value="upcoming" className="space-y-6 mt-6">
-          <Card className="bg-background/50 backdrop-blur-sm border-primary/10">
-            <CardHeader>
-              <CardTitle>Upcoming Sessions</CardTitle>
-              <CardDescription>Your scheduled teaching and learning sessions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="space-y-4">
-                  <UpcomingSessionSkeleton />
-                  <UpcomingSessionSkeleton />
-                  <UpcomingSessionSkeleton />
-                </div>
-              ) : error ? (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              ) : upcomingSessions.length > 0 ? (
-                <div className="space-y-4">
-                  {upcomingSessions.map((session) => (
-                    <UpcomingSession
-                      key={session.id}
-                      title={session.skill.name}
-                      role={session.teacherId === userId ? "teacher" : "student"}
-                      with={session.teacherId === userId 
-                        ? `${session.learner.firstName || ''} ${session.learner.lastName || ''}`.trim() 
-                        : `${session.teacher.firstName || ''} ${session.teacher.lastName || ''}`.trim()}
-                      date={new Date(session.scheduledTime).toLocaleString()}
-                      tokens={session.tokenAmount || 0}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center py-6 text-muted-foreground">
-                  No upcoming sessions scheduled.
-                  <br />
-                  <span className="text-sm">Use the "Schedule Session" button to book your next session.</span>
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+      {!error && (
+        <Tabs defaultValue="upcoming" className="mt-6">
+          <TabsList className="bg-background/50 backdrop-blur-sm">
+            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="history" className="space-y-6 mt-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Session History</h2>
-            <Button variant="outline">Export History</Button>
-          </div>
+          <TabsContent value="upcoming" className="space-y-6 mt-6">
+            <Card className="bg-background/50 backdrop-blur-sm border-primary/10">
+              <CardHeader>
+                <CardTitle>Upcoming Sessions</CardTitle>
+                <CardDescription>Your scheduled teaching and learning sessions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? ( // Show skeleton while loading specifically this tab's data if needed
+                  <div className="space-y-4">
+                    <UpcomingSessionSkeleton />
+                    <UpcomingSessionSkeleton />
+                  </div>
+                ) : upcomingSessions.length > 0 ? (
+                  <div className="space-y-4">
+                    {upcomingSessions.map((session) => (
+                      <UpcomingSession
+                        key={session.id}
+                        title={session.skill.name}
+                        role={session.teacher_id === user?.id ? "teacher" : "student"} // Use snake_case
+                        with={session.teacher_id === user?.id // Use snake_case
+                          ? `${session.learner.first_name || ''} ${session.learner.last_name || ''}`.trim()
+                          : `${session.teacher.first_name || ''} ${session.teacher.last_name || ''}`.trim()}
+                        date={new Date(session.start_time).toLocaleString()} // Use snake_case
+                        tokens={session.token_amount || 0}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center py-6 text-muted-foreground">
+                    No upcoming sessions scheduled.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-          {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              <span className="ml-3 text-muted-foreground">Loading sessions...</span>
+          <TabsContent value="history" className="space-y-6 mt-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Session History</h2>
+              <Button variant="outline">Export History</Button>
             </div>
-          ) : error ? (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          ) : (
-            <SessionHistory 
-              profileData={{ 
-                sessions: pastSessions.map(session => ({
-                  id: session.id,
-                  skill: { title: session.skill.name },
-                  partnerName: session.teacherId === userId 
-                    ? `${session.learner.firstName || ''} ${session.learner.lastName || ''}`.trim() 
-                    : `${session.teacher.firstName || ''} ${session.teacher.lastName || ''}`.trim(),
-                  date: session.scheduledTime,
-                  duration: "1 hour", // Assume 1 hour or calculate from endTime if available
-                  notes: session.notes || undefined,
-                  role: session.teacherId === userId ? 'teacher' : 'learner',
-                  status: 'completed'
-                }))
-              }} 
-            />
-          )}
-        </TabsContent>
+             {isLoading ? (
+               <div className="flex justify-center items-center py-12">
+                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+               </div>
+             ) : (
+               <SessionHistory
+                 profileData={{ // Pass sessions directly if SessionHistory expects this structure
+                   sessions: pastSessions.map(session => ({
+                     id: session.id,
+                     skill: { title: session.skill.name },
+                     partnerName: session.teacher_id === user?.id // Use snake_case
+                       ? `${session.learner.first_name || ''} ${session.learner.last_name || ''}`.trim()
+                       : `${session.teacher.first_name || ''} ${session.teacher.last_name || ''}`.trim(),
+                     date: session.start_time, // Use snake_case
+                     duration: "1 hour", // TODO: Calculate duration properly if end_time exists
+                     notes: session.notes || undefined,
+                     role: session.teacher_id === user?.id ? 'teacher' : 'learner', // Use snake_case
+                     status: session.status
+                   }))
+                 }}
+               />
+             )}
+          </TabsContent>
 
-        <TabsContent value="calendar" className="space-y-6 mt-6">
-          <Card className="bg-background/50 backdrop-blur-sm border-primary/10">
-            <CardHeader>
-              <CardTitle>Session Calendar</CardTitle>
-              <CardDescription>View and manage your schedule</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-center">
-                <Calendar 
-                  mode="single" 
-                  className="rounded-md border border-primary/10 bg-background/50 p-3"
-                  // Optionally: highlight dates with sessions
-                  // disabled={[...upcomingSessions, ...pastSessions].map(s => new Date(s.scheduledTime))}
-                  // modifiers={{highlighted: [...upcomingSessions].map(s => new Date(s.scheduledTime))}}
-                  // modifiersStyles={{highlighted: {backgroundColor: 'var(--primary/10)'}}}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="calendar" className="space-y-6 mt-6">
+            <Card className="bg-background/50 backdrop-blur-sm border-primary/10">
+              <CardHeader>
+                <CardTitle>Session Calendar</CardTitle>
+                <CardDescription>View and manage your schedule</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-center">
+                  <Calendar
+                    mode="single"
+                    className="rounded-md border border-primary/10 bg-background/50 p-3"
+                    // TODO: Implement highlighting/disabling dates based on session data
+                    // modifiers={{highlighted: [...upcomingSessions].map(s => new Date(s.scheduledTime))}}
+                    // modifiersStyles={{highlighted: {backgroundColor: 'var(--primary/10)'}}}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      )}
     </DashboardShell>
-  )
+  );
 }
